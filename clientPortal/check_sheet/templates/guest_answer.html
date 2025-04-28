@@ -1,0 +1,20 @@
+<!-- check_sheet/templates/check_sheet/guest_answer.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>チェックシート回答</title>
+</head>
+<body>
+    <h1>{{ check_sheet.name }} - チェックシート回答</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">送信</button>
+    </form>
+
+    <br>
+    <a href="{% url 'check_sheet:index' %}">チェックシートのTOP画面に戻る</a>
+</body>
+</html>

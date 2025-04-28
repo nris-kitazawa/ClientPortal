@@ -28,10 +28,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# clinet_portal/settings.py
+
+LOGIN_REDIRECT_URL = '/top/'  # ログイン後、TOP画面にリダイレクト
+
 
 # Application definition
 
-APPS = ["nris"]
+APPS = ["top", "check_sheet"]
 
 INSTALLED_APPS = [
     'django.contrib.admin',

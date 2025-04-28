@@ -1,0 +1,23 @@
+<!-- check_sheet/templates/check_sheet/check_sheet_index.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>チェックシート管理</title>
+</head>
+<body>
+    <h1>チェックシート管理</h1>
+
+    <ul>
+    {% for check_sheet in check_sheets %}
+        <li>
+            <a href="{{ check_sheet.get_absolute_url }}">{{ check_sheet.name }}</a>
+            <a href="{% url 'check_sheet:delete' check_sheet.id %}">削除</a>
+        </li>
+    {% endfor %}
+    </ul>
+
+    <br>
+    <a href="{% url 'check_sheet:create' %}">新しいチェックシートを作成</a>
+</body>
+</html>

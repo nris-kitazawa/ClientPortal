@@ -1,0 +1,16 @@
+<!-- check_sheet/templates/check_sheet/create_check_sheet.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>チェックシート作成</title>
+</head>
+<body>
+    <h1>チェックシート作成</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">作成する</button>
+    </form>
+</body>
+</html>
