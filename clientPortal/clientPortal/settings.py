@@ -30,12 +30,13 @@ ALLOWED_HOSTS = []
 
 # clinet_portal/settings.py
 
+LOGIN_URL = '/login/'  # ログインページのURLに合わせて調整
 LOGIN_REDIRECT_URL = '/top/'  # ログイン後、TOP画面にリダイレクト
 
 
 # Application definition
 
-APPS = ["top", "check_sheet"]
+APPS = ["top", "check_sheet", "core"]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -54,7 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
+] + ["clientPortal.middleware.LoginRequiredMiddleware"]
 
 ROOT_URLCONF = 'clientPortal.urls'
 

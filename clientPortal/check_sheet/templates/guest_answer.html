@@ -1,4 +1,8 @@
 <!-- check_sheet/templates/check_sheet/guest_answer.html -->
+
+{% extends "base.html" %}
+
+{% block content %}
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -18,3 +22,4 @@
     <a href="{% url 'check_sheet:index' %}">チェックシートのTOP画面に戻る</a>
 </body>
 </html>
+{% endblock %}

@@ -1,14 +1,5 @@
 # views.py
-from django.contrib.auth.views import LoginView
 from django.shortcuts import render
-
-# ログインページを表示するためにLoginViewを利用
-class CustomLoginView(LoginView):
-    template_name = 'login.html'  # ログインフォームのテンプレート
-
-from django.contrib.auth.decorators import login_required
-
-@login_required
 def top_page(request):
     # ログインユーザーのグループを確認
     if request.user.groups.filter(name='NRIS').exists():

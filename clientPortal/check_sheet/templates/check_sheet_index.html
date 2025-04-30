@@ -1,4 +1,7 @@
 <!-- check_sheet/templates/check_sheet/check_sheet_index.html -->
+{% extends "base.html" %}
+
+{% block content %}
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -21,3 +24,4 @@
     <a href="{% url 'check_sheet:create' %}">新しいチェックシートを作成</a>
 </body>
 </html>
+{% endblock %}

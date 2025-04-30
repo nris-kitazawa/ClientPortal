@@ -1,0 +1,34 @@
+<!-- check_sheet/templates/base.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}チェックシート管理{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900 min-h-screen flex flex-col">
+    <!-- ヘッダー -->
+    <header class="bg-white shadow">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-blue-600">ClientPortal</h1>
+            <nav>
+                <a href="{% url 'check_sheet:top' %}" class="text-gray-600 hover:text-blue-500 mr-4">チェックシート</a>
+                <a href="{% url 'logout' %}" class="text-gray-600 hover:text-red-500">ログアウト</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- メイン -->
+    <main class="flex-1 container mx-auto px-4 py-6">
+        {% block content %}
+        <!-- 各テンプレートの内容がここに挿入されます -->
+        {% endblock %}
+    </main>
+
+    <!-- フッター -->
+    <footer class="bg-white border-t text-center text-sm text-gray-500 py-4">
+        &copy; 2025 ClientPortal. All rights reserved.
+    </footer>
+</body>
+</html>

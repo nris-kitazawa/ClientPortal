@@ -1,4 +1,9 @@
 <!-- check_sheet/templates/check_sheet/thank_you.html -->
+
+
+{% extends "base.html" %}
+
+{% block content %}
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -9,6 +14,7 @@
     <h1>チェックシートの回答が送信されました。</h1>
     <p>ご回答いただきありがとうございます。</p>
 
-    <a href="{% url 'check_sheet:index' %}">チェックシートのTOP画面に戻る</a>
+    <a href="{% url 'top:top' %}">チェックシートのTOP画面に戻る</a>
 </body>
 </html>
+{% endblock %}

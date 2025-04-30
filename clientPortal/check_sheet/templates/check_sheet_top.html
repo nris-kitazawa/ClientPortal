@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>チェックシート TOP</h1>
+
+<!-- チェックシートの作成フォーム -->
+<h3><a href="{% url 'check_sheet:create' %}">新規チェックシート作成</a></h3>
+
+
+<hr>
+
+<!-- 自分のチェックシート一覧 -->
+<h3>自分のチェックシート</h3>
+<ul>
+  {% for sheet in my_sheets %}
+    <li>
+      <a href="{% url 'check_sheet:detail' sheet.id %}">{{ sheet.title }}</a> |
+      <a href="{% url 'check_sheet:edit' sheet.id %}">編集</a>
+    </li>
+  {% empty %}
+    <li>作成されたチェックシートはありません。</li>
+  {% endfor %}
+</ul>
+
+<!-- 閲覧したチェックシート（例: セッション保存ベース） -->
+<h3>閲覧履歴</h3>
+<ul>
+  {% for sheet in viewed_sheets %}
+    <li><a href="{% url 'check_sheet:detail' sheet.id %}">{{ sheet.title }}</a></li>
+  {% empty %}
+    <li>閲覧履歴はありません。</li>
+  {% endfor %}
+</ul>
+
+<!-- チェックシート検索 -->
+<h3>他の人のチェックシート検索</h3>
+<form method="get" action="{% url 'check_sheet:search' %}">
+  <input type="text" name="q" placeholder="キーワードを入力">
+  <button type="submit">検索</button>
+</form>
+<ul>
+  {% for sheet in search_results %}
+    <li><a href="{% url 'check_sheet:detail' sheet.id %}">{{ sheet.title }}</a></li>
+  {% empty %}
+    {% if request.GET.q %}
+      <li>該当するチェックシートは見つかりませんでした。</li>
+    {% endif %}
+  {% endfor %}
+</ul>
+
+{% endblock %}
