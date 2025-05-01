@@ -6,7 +6,7 @@
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
+    <a href="{% url 'check_sheet:detail' check_sheet.id %}" class="btn btn-secondary">キャンセル</a>
     <button type="submit" class="btn btn-success">保存する</button>
-    <a href="{% url 'check_sheet:detail' check_sheet.pk %}" class="btn btn-secondary">キャンセル</a>
 </form>
 {% endblock %}

@@ -7,21 +7,17 @@
 <head>
     <meta charset="UTF-8">
     <title>チェックシート作成完了</title>
-    <script>
-        function showPopup() {
-            alert("ゲストユーザー用のリンクとパスワードが生成されました。\n\nリンク: {{ check_sheet.get_absolute_url }}\nパスワード: {{ check_sheet.password }}");
-        }
-    </script>
 </head>
 <body>
     <h1>チェックシートの作成が完了しました。</h1>
     <p>以下のリンクとパスワードをゲストユーザーに送信してください:</p>
     
     <!-- ゲスト用リンクとパスワード -->
-    <button onclick="showPopup()">ゲスト用リンクとパスワードを表示</button>
+    <p>リンク: https://{{ request.get_host }}/check_sheet/{{check_sheet.id}}</p>
+    <p>パスワード: {{ check_sheet.password }}</p>
 
     <br><br>
-    <a href="{% url 'top:top' %}">チェックシートのTOP画面に戻る</a>
+    <a href="{% url 'top' %}">チェックシートのTOP画面に戻る</a>
 </body>
 </html>
 

@@ -1,16 +1,17 @@
 {% extends "base.html" %}
 
-{% extends "top/nris_base.html" %}
-
 {% block content %}
-<h2>{{ check_sheet.title }}</h2>
+  <h2>チェックシート詳細</h2>
 
-<p><strong>説明:</strong></p>
-<p>{{ check_sheet.description }}</p>
+  <form>
+    {% for field in form %}
+      <div class="mb-3">
+        <label class="form-label">{{ field.label }}</label>
+        {{ field }}
+      </div>
+    {% endfor %}
+  </form>
 
-<p><strong>作成者:</strong> {{ check_sheet.created_by.username }}</p>
-<p><strong>URL:</strong> <code>{{ check_sheet.url }}</code></p>
-
-<a href="{% url 'check_sheet:edit' check_sheet.pk %}" class="btn btn-primary">編集</a>
-<a href="{% url 'check_sheet:top' %}" class="btn btn-secondary">戻る</a>
+  <a href="{% url 'check_sheet:top' %}" class="btn btn-secondary">戻る</a>
+  <a href="{% url 'check_sheet:edit' check_sheet.id %}" class="btn btn-primary">編集</a>
 {% endblock %}
