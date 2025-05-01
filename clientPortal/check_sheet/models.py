@@ -10,7 +10,7 @@ class CheckSheet(models.Model):
     description = models.TextField(null=True, blank=True)  # チェックシートの説明
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)  # 作成者（NRISユーザー）
     password = models.CharField(max_length=10, null=True, blank=True)  # クライアント用のパスワード
-    id = models.CharField(primary_key=True, max_length=100)
+    id = models.CharField(primary_key=True, max_length=100, editable=False)
 
     #Contents
     system_name = models.CharField(max_length=100, null=True, blank=True)
@@ -63,7 +63,6 @@ class CheckSheet(models.Model):
             self.password = self.generate_password()
         if not self.id:
             self.id = self.generate_custom_uuid()
-            self.id.editable=False
         super(CheckSheet, self).save(*args, **kwargs)
 
     def generate_custom_uuid(self): 

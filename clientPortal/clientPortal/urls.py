@@ -21,5 +21,6 @@ urlpatterns = [
     path("", include("top.urls")),
     path("", include("core.urls")),
     path("check_sheet/", include("check_sheet.urls")),
+    path("guest/check_sheet/", include("check_sheet.urls")),
     path("admin/", admin.site.urls)
 ]

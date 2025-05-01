@@ -1,10 +1,9 @@
 # clientPortal/urls.
 from django.urls import path
-from .views import login_view
-from django.contrib.auth.views import LogoutView
+from . import views
 
 urlpatterns = [
-    path('', login_view, name='login'),
-    path('login/', login_view, name='login'),
-    path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
+    path('', views.login_view, name='login'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
 ]

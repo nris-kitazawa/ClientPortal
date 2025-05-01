@@ -15,3 +15,11 @@ def login_view(request):
         else:
             messages.error(request, "ログイン情報が正しくありません。")
     return render(request, "login.html")
+
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+
+def logout_view(request):
+    logout(request)  # セッションデータと認証情報をすべて削除
+    return redirect('login')  # ログインページなどにリダイレクト
+

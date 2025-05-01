@@ -13,11 +13,11 @@
     <p>以下のリンクとパスワードをゲストユーザーに送信してください:</p>
     
     <!-- ゲスト用リンクとパスワード -->
-    <p>リンク: https://{{ request.get_host }}/check_sheet/{{check_sheet.id}}</p>
+    <p>リンク: {{ request.scheme }}://{{ request.get_host }}/guest/check_sheet/edit/{{check_sheet.id}}</p>
     <p>パスワード: {{ check_sheet.password }}</p>
 
     <br><br>
-    <a href="{% url 'top' %}">チェックシートのTOP画面に戻る</a>
+    <a href="{% url 'check_sheet:top' %}">チェックシートのTOP画面に戻る</a>
 </body>
 </html>
 

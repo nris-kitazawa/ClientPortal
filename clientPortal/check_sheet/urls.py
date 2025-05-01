@@ -10,5 +10,4 @@ urlpatterns = [
     path("detail/<slug:id>/", views.check_sheet_detail, name="detail"),
     path("edit/<slug:id>/", views.edit_check_sheet, name="edit"),
     path("search/", views.check_sheet_top, name="search"),  # 検索もトップビューで処理
-    path('guest/<slug:id>/', views.edit_check_sheet, name='guest_detail'),
 ]
