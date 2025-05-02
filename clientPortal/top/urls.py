@@ -1,12 +1,10 @@
 # urls.py
 from django.urls import path
-
-# apps/check_sheet/urls.py
-from .views import top_page
+from .views import top_page, root_page
 
 app_name = "top"
 
 urlpatterns = [
-    path("", top_page, name="root_redirect"),
-    path("top/", top_page, name="top")
+    path("", root_page, name="root_page"),
+    path("top/", top_page, name="top"),
 ]

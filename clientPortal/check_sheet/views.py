@@ -1,45 +1,15 @@
 # check_sheet/views.py
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .forms import CheckSheetForm
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.models import User, Group
+from django.http import HttpResponseForbidden
+from .forms import CheckSheetForm, CheckSheetDetailForm, CheckSheetEditForm
 from .models import CheckSheet
+from core.functions.userCheckHelper import is_guest_user
+from core.functions.decorator import guest_forbidden
 import random
 import string
 
-def create_check_sheet(request):
-    if request.method == 'POST':
-        form = CheckSheetForm(request.POST)
-        if form.is_valid():
-            # チェックシートを保存
-            check_sheet = form.save(commit=False)
-            check_sheet.created_by = request.user
-            check_sheet.save()
-
-            # 成功メッセージを表示
-            messages.success(request, 'チェックシートが作成されました！')
-
-            # ゲスト用リンクとパスワードを表示するページに遷移
-            return render(request, 'check_sheet_created.html', {'check_sheet': check_sheet})
-    else:
-        form = CheckSheetForm()
-
-    return render(request, 'create_check_sheet.html', {'form': form})
-
-# check_sheet/views.py
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import CheckSheet
-
-def delete_check_sheet(request, id):
-    check_sheet = get_object_or_404(CheckSheet, id=id, user=request.user)
-    check_sheet.delete()
-    return redirect('check_sheet:index')
-
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import CheckSheet
-from .forms import CheckSheetForm, CheckSheetDetailForm
-from django.contrib.auth.decorators import login_required
-from django.db.models import Q
-
+@guest_forbidden
 def check_sheet_top(request):
     form = CheckSheetForm()
     my_sheets = CheckSheet.objects.filter(created_by=request.user)
@@ -60,20 +30,56 @@ def check_sheet_top(request):
     }
     return render(request, "check_sheet_top.html", context)
 
-from django.shortcuts import render, get_object_or_404
-from .models import CheckSheet
-from django.contrib.auth.decorators import login_required
+@guest_forbidden
+def create_check_sheet(request):
+    if request.method == 'POST':
+        form = CheckSheetForm(request.POST)
+        if form.is_valid():
+            # チェックシートを保存
+            check_sheet = form.save(commit=False)
+            check_sheet.created_by = request.user
+            check_sheet.save()
+
+            # ゲストユーザーの発行
+            guest_username = check_sheet.id
+            guest_password = check_sheet.password
+            guest_user = User.objects.create_user(
+                username=guest_username,
+                password=guest_password,
+                is_active=True,
+            )
+            # ゲストグループに追加
+            guest_group, _ = Group.objects.get_or_create(name="guest")
+            guest_user.groups.add(guest_group)
+            guest_user.save()
+
+            # ゲスト用リンクとパスワードを表示するページに遷移
+            return render(request, 'check_sheet_created.html', {
+                'check_sheet': check_sheet
+            })
+    else:
+        form = CheckSheetForm()
+
+    return render(request, 'create_check_sheet.html', {'form': form})
+
+@guest_forbidden
+def delete_check_sheet(request, id):
+    check_sheet = get_object_or_404(CheckSheet, id=id, user=request.user)
+    check_sheet.delete()
+    return redirect('check_sheet:index')
 
 def check_sheet_detail(request, id):
+    if is_guest_user(request.user) and request.user.username != id:
+        return HttpResponseForbidden("このページは対応するNRIS社員またはゲストユーザーのみがアクセスできます。")
+
     check_sheet = get_object_or_404(CheckSheet, id=id)
     form = CheckSheetDetailForm(instance=check_sheet)
     return render(request, "check_sheet_detail.html", {"form" : form, "check_sheet": check_sheet})
 
-from .forms import CheckSheetEditForm
-from django.shortcuts import redirect
-
 def edit_check_sheet(request, id):
-    check_sheet = get_object_or_404(CheckSheet, id=id, created_by=request.user)
+    if is_guest_user(request.user) and request.user.username != id:
+        return HttpResponseForbidden("このページは対応するNRIS社員またはゲストユーザーのみがアクセスできます。")
+    check_sheet = get_object_or_404(CheckSheet, id=id)
 
     if request.method == "POST":
         form = CheckSheetEditForm(request.POST, instance=check_sheet)
@@ -84,12 +90,6 @@ def edit_check_sheet(request, id):
         form = CheckSheetEditForm(instance=check_sheet)
 
     return render(request, "edit_check_sheet.html", {"form": form, "check_sheet": check_sheet})
-
-def guest_check_sheet_detail(request, uuid):
-    check_sheet = get_object_or_404(CheckSheet, uuid=uuid)
-    return render(request, 'check_sheet_detail', {
-        'check_sheet': check_sheet
-    })
 
 
 

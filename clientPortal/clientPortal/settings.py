@@ -26,11 +26,10 @@ SECRET_KEY = 'django-insecure-qki&isye&jx7gbbx94@g6pz7&v)#qcdau-4h%dir*q7f4_8y2v
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "127.0.0.1:8000"]
 
 # clinet_portal/settings.py
 
-LOGIN_URL = '/login/'  # ログインページのURLに合わせて調整
 LOGIN_REDIRECT_URL = '/top/'  # ログイン後、TOP画面にリダイレクト
 
 

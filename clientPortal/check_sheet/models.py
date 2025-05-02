@@ -9,7 +9,7 @@ class CheckSheet(models.Model):
     title = models.CharField(max_length=200, null=True, blank=True)  # チェックシートのタイトル
     description = models.TextField(null=True, blank=True)  # チェックシートの説明
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)  # 作成者（NRISユーザー）
-    password = models.CharField(max_length=10, null=True, blank=True)  # クライアント用のパスワード
+    password = models.CharField(max_length=64, null=True, blank=True)  # クライアント用のパスワード
     id = models.CharField(primary_key=True, max_length=100, editable=False)
 
     #Contents
@@ -71,10 +71,6 @@ class CheckSheet(models.Model):
     def generate_password(self):
         """パスワードをランダムに生成"""
         return ''.join(random.choices(string.ascii_letters + string.digits, k=8))
-
-    def getURL(self):
-        """URLをランダムに生成"""
-        return f"/check_sheet/{self.id}/"
 
     def __str__(self):
         return self.title

@@ -2,12 +2,16 @@
 
 {% block content %}
   <h2>チェックシート詳細</h2>
-
+  <p>
+    リンク: 
+    <a href='{{ request.scheme }}://{{ request.get_host }}/guest/login/?next=check_sheet/edit/{{check_sheet.id}}'>
+      {{ request.scheme }}://{{ request.get_host }}/guest/login/?next=check_sheet/edit/{{check_sheet.id}}
+    </a>
+  </p>
   <form>
     {% for field in form %}
-      <div class="mb-3">
-        <label class="form-label">{{ field.label }}</label>
-        {{ field }}
+      <div>
+        {{ field.label }}: {{ field.value }}
       </div>
     {% endfor %}
   </form>

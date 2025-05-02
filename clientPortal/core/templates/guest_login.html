@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>ゲスト用パスワード入力</h2>
+<form method="post">
+    {% csrf_token %}
+    <input type="password" name="password" placeholder="パスワード" required>
+    <button type="submit">ログイン</button>
+</form>
+{% if error %}
+<p style="color:red;">{{ error }}</p>
+{% endif %}
+
+{% endblock %}

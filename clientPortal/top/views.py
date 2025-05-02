@@ -1,5 +1,6 @@
 # views.py
 from django.shortcuts import render
+
 def top_page(request):
     # ログインユーザーのグループを確認
     if request.user.groups.filter(name='NRIS').exists():
@@ -11,5 +12,8 @@ def top_page(request):
     else:
         # その他のユーザー（エラー表示）
         return render(request, 'error_page.html')  # エラーページを表示
-    
-    
+
+def root_page(request):
+    return render(request, "index.html")
+
+

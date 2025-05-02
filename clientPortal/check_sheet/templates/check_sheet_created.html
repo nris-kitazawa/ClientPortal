@@ -13,7 +13,7 @@
     <p>以下のリンクとパスワードをゲストユーザーに送信してください:</p>
     
     <!-- ゲスト用リンクとパスワード -->
-    <p>リンク: {{ request.scheme }}://{{ request.get_host }}/guest/check_sheet/edit/{{check_sheet.id}}</p>
+    <p>リンク: {{ request.scheme }}://{{ request.get_host }}/guest/login/?next=check_sheet/edit/{{check_sheet.id}}</p>
     <p>パスワード: {{ check_sheet.password }}</p>
 
     <br><br>
