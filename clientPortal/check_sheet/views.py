@@ -79,10 +79,10 @@ def check_sheet_detail(request, id):
 def edit_check_sheet(request, id):
     if is_guest_user(request.user) and request.user.username != id:
         return HttpResponseForbidden("このページは対応するNRIS社員またはゲストユーザーのみがアクセスできます。")
-    
+
     check_sheet = get_object_or_404(CheckSheet, id=id)
     system_summary, _ = SystemSummary.objects.get_or_create(check_sheet=check_sheet)
-    
+
     AssessTargetFormSet = modelformset_factory(
         AssessTarget,
         form=AssessTargetForm,
@@ -95,20 +95,55 @@ def edit_check_sheet(request, id):
         extra=1,
         can_delete=True
     )
-    
+
     if request.method == "POST":
-        formset = AssessTargetFormSet(request.POST, queryset=AssessTarget.objects.filter(check_sheet=check_sheet), prefix="assess_target")
-        login_formset = LoginCredentialFormSet(request.POST, queryset=LoginCredential.objects.filter(check_sheet=check_sheet), prefix="login_credential")
-        
-        if formset.is_valid() and login_formset.is_valid():
-            formset.save()
-            login_formset.save()
+        check_sheet_form = CheckSheetEditForm(request.POST, instance=check_sheet)
+        system_summary_form = SystemSummaryForm(request.POST, instance=system_summary)
+        formset = AssessTargetFormSet(
+            request.POST,
+            queryset=AssessTarget.objects.filter(check_sheet=check_sheet),
+            prefix="assess_target"
+        )
+        login_formset = LoginCredentialFormSet(
+            request.POST,
+            queryset=LoginCredential.objects.filter(check_sheet=check_sheet),
+            prefix="login_credential"
+        )
+
+        if check_sheet_form.is_valid() and system_summary_form.is_valid() and formset.is_valid() and login_formset.is_valid():
+            check_sheet_form.save()
+            system_summary_form.save()
+
+            instances = formset.save(commit=False)
+            for obj in instances:
+                obj.check_sheet = check_sheet
+                obj.save()
+            for obj in formset.deleted_objects:
+                obj.delete()
+
+            login_instances = login_formset.save(commit=False)
+            for obj in login_instances:
+                obj.check_sheet = check_sheet
+                obj.save()
+            for obj in login_formset.deleted_objects:
+                obj.delete()
+
             return redirect("check_sheet:detail", id=check_sheet.id)
     else:
-        formset = AssessTargetFormSet(queryset=AssessTarget.objects.filter(check_sheet=check_sheet), prefix="assess_target")
-        login_formset = LoginCredentialFormSet(queryset=LoginCredential.objects.filter(check_sheet=check_sheet), prefix="login_credential")
+        check_sheet_form = CheckSheetEditForm(instance=check_sheet)
+        system_summary_form = SystemSummaryForm(instance=system_summary)
+        formset = AssessTargetFormSet(
+            queryset=AssessTarget.objects.filter(check_sheet=check_sheet),
+            prefix="assess_target"
+        )
+        login_formset = LoginCredentialFormSet(
+            queryset=LoginCredential.objects.filter(check_sheet=check_sheet),
+            prefix="login_credential"
+        )
 
     return render(request, "edit_check_sheet.html", {
+        "form": check_sheet_form,
+        "sys_form": system_summary_form,
         "formset": formset,
         "login_formset": login_formset,
         "check_sheet": check_sheet,

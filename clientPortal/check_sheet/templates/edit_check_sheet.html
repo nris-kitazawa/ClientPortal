@@ -12,16 +12,16 @@
 <script src="{% static 'js/edit_check_sheet.js' %}"></script>
 {% endblock %}
 
-<h2>チェックシート編集: {{ check_sheet.title }}</h2>
+<h2>タイトル: {{ check_sheet.title }}</h2>
 <form method="post" id="edit-form">
     {% csrf_token %}
-    <h2>Check Sheet</h2>
+    <h2>チェックシート（可能な範囲でご記入願います）</h2>
     {{ form.as_table }}
 
-    <h2>System Summary</h2>
+    <h2>診断対象システムの概要</h2>
     {{ sys_form.as_p }}
 
-    <h2>Assess Targets</h2>
+    <h2>診断対象情報</h2>
     {{ formset.management_form }}
     <div id="formset-table-container">
         <table id="formset-table" data-empty-form="{{ formset.empty_form.as_p|force_escape }}">
@@ -60,7 +60,7 @@
     </div>
     <button type="button" id="add-row-btn">1行追加</button>
 
-    <h2>Assess Login Credentials</h2>
+    <h2>診断用認証情報（認証有のアプリケーションでは必須）</h2>
     {{ login_formset.management_form }}
     <div id="login-credentials-table-container">
         <table id="login-credentials-table" data-empty-form="{{ login_formset.empty_form.as_p|force_escape }}">
@@ -90,6 +90,9 @@
         </table>
     </div>
     <button type="button" id="add-login-row-btn">1行追加</button>
+
+    
+
     <br>
     <button type="submit">保存</button>
 </form>
