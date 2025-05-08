@@ -78,3 +78,13 @@ class AssessTarget(models.Model):
     ap_server = models.CharField(max_length=200, verbose_name='APサーバ', null=True)
     framework = models.CharField(max_length=200, verbose_name='フレームワーク', null=True)
     db_server = models.CharField(max_length=200, verbose_name='DBサーバ', null=True)
+
+class LoginCredential(models.Model):
+    check_sheet = models.ForeignKey(
+        'CheckSheet', 
+        on_delete=models.CASCADE, 
+        related_name='login_credentials'
+    )
+    login_id = models.CharField(max_length=255, verbose_name="ログインID")
+    password = models.CharField(max_length=255, verbose_name="パスワード")
+    role = models.CharField(max_length=255, verbose_name="権限")

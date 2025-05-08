@@ -1,6 +1,7 @@
 # check_sheet/forms.py
 from django import forms
 from .models import *
+from django.forms import modelformset_factory
 
 class BaseForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -42,13 +43,11 @@ class AssessTargetForm(BaseForm):
         fields = '__all__'
         exclude = ['check_sheet']
 
-from django.forms import modelformset_factory
-AssessTargetFormSet = modelformset_factory(
-    AssessTarget,
-    form=AssessTargetForm,
-    extra=1,  # 新規追加用の空フォーム数
-    can_delete=True  # 行の削除も可能に
-)
+class LoginCredentialForm(BaseForm):
+    class Meta:
+        model = LoginCredential
+        fields = '__all__'
+        exclude = ['check_sheet']
 
 class CheckSheetDetailForm(BaseForm):
     class Meta:

@@ -89,6 +89,13 @@ def edit_check_sheet(request, id):
         extra=1,
         can_delete=True
     )
+    LoginCredentialFormSet = modelformset_factory(
+        LoginCredential,
+        form=LoginCredentialForm,
+        extra=1,
+        can_delete=True
+    )
+    
     form_classes = [CheckSheetEditForm, SystemSummaryForm]
     instances = [check_sheet, system_summary]
     form_keys = ["form", "sys_form"]
@@ -96,20 +103,22 @@ def edit_check_sheet(request, id):
     if request.method == "POST":
         forms_list = [cls(request.POST, instance=inst) for cls, inst in zip(form_classes, instances)]
         formset = AssessTargetFormSet(request.POST, queryset=AssessTarget.objects.filter(check_sheet=check_sheet))
+        login_formset = LoginCredentialFormSet(request.POST, queryset=check_sheet.login_credentials.all())
         
-        if all(f.is_valid() for f in forms_list) and formset.is_valid():
+        if all(f.is_valid() for f in forms_list) and formset.is_valid() and login_formset.is_valid():
             for f in forms_list:
                 f.save()
             formset.save()
+            login_formset.save()
             return redirect("check_sheet:detail", id=check_sheet.id)
     else:
         forms_list = [cls(instance=inst) for cls, inst in zip(form_classes, instances)]
         formset = AssessTargetFormSet(queryset=AssessTarget.objects.filter(check_sheet=check_sheet))
+        login_formset = LoginCredentialFormSet(queryset=check_sheet.login_credentials.all())
 
     context = dict(zip(form_keys, forms_list))
     context["formset"] = formset
+    context["login_formset"] = login_formset
     context["check_sheet"] = check_sheet
 
     return render(request, "edit_check_sheet.html", context)
-
-
