@@ -2,12 +2,17 @@
 from django import forms
 from .models import *
 
-class CheckSheetForm(forms.ModelForm):
+class BaseForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', '')
+        super().__init__(*args, **kwargs)
+
+class CheckSheetForm(BaseForm):
     class Meta:
         model = CheckSheet
         fields = ['title']  # ユーザーに入力してもらうフィールド
 
-class CheckSheetEditForm(forms.ModelForm):
+class CheckSheetEditForm(BaseForm):
     class Meta:
         model = CheckSheet
         fields = '__all__'
@@ -18,7 +23,7 @@ class CheckSheetEditForm(forms.ModelForm):
             })
         }
 
-class SystemSummaryForm(forms.ModelForm):
+class SystemSummaryForm(BaseForm):
     class Meta:
         model = SystemSummary
         fields = '__all__'
@@ -31,7 +36,7 @@ class SystemSummaryForm(forms.ModelForm):
             })
         }
 
-class AssessTargetForm(forms.ModelForm):
+class AssessTargetForm(BaseForm):
     class Meta:
         model = AssessTarget
         fields = '__all__'
@@ -45,7 +50,7 @@ AssessTargetFormSet = modelformset_factory(
     can_delete=True  # 行の削除も可能に
 )
 
-class CheckSheetDetailForm(forms.ModelForm):
+class CheckSheetDetailForm(BaseForm):
     class Meta:
         model = CheckSheet
         fields = '__all__'

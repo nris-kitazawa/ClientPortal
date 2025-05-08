@@ -4,7 +4,7 @@
 <form method="post" id="edit-form">
     {% csrf_token %}
     <h2>Check Sheet</h2>
-    {{ form.as_p }}
+    {{ form.as_table }}
 
     <h2>System Summary</h2>
     {{ sys_form.as_p }}
@@ -15,12 +15,6 @@
         {% for form in formset %}
             <tr class="form-row">
                 <td>{{ form.as_p }}</td>
-                {% if form.instance.pk %}
-                    <td>
-                        <label for="{{ form.DELETE.id_for_label }}">削除</label>
-                        {{ form.DELETE }}
-                    </td>
-                {% endif %}
             </tr>
         {% endfor %}
     </table>
@@ -102,4 +96,10 @@
         }
     });
 </script>
+
+<style>
+    input[type="checkbox"][name$="-DELETE"] {
+        display: none;
+    }
+</style>
 {% endblock %}
