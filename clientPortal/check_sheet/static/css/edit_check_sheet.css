@@ -1,0 +1,110 @@
+input[type="checkbox"][name$="-DELETE"] {
+    display: none;
+}
+
+/* テーブル全体のスタイル */
+#formset-table,
+#login-credentials-table {
+    width: 100%; /* テーブルを親要素の幅に合わせる */
+    border-collapse: collapse; /* セルの境界線を結合 */
+    table-layout: auto; /* 列幅を固定 */
+}
+
+/* テーブルのセル */
+#formset-table td,
+#formset-table th,
+#login-credentials-table td,
+#login-credentials-table th {
+    padding: 8px;
+    text-align: left;
+    border: 1px solid #ddd; /* セルの境界線 */
+    word-wrap: break-word; /* 長い単語を折り返す */
+    white-space: normal; /* テキストを複数行に折り返す */
+}
+
+/* ヘッダーの背景色 */
+#formset-table th,
+#login-credentials-table th {
+    background-color: #f4f4f4;
+}
+
+/* 入力フィールドのスタイル */
+#formset-table input,
+#login-credentials-table input {
+    width: 100%; /* 入力フィールドをセルの幅に合わせる */
+    box-sizing: border-box; /* パディングを含めて幅を計算 */
+    resize: vertical; /* テキストエリアの高さを調整可能にする */
+    overflow-wrap: break-word; /* 長い単語を折り返す */
+    white-space: pre-wrap; /* テキストを複数行に折り返す */
+}
+
+/* テーブル全体をスクロール可能にする */
+#formset-table-container,
+#login-credentials-table-container {
+    overflow-x: auto; /* 横スクロールを有効にする */
+}
+
+/* No.列と削除ボタン列の幅を狭くする */
+#formset-table th:nth-child(1),
+#formset-table td:nth-child(1),
+#login-credentials-table th:nth-child(1),
+#login-credentials-table td:nth-child(1),
+#formset-table th:nth-child(9),
+#formset-table td:nth-child(9),
+#login-credentials-table th:nth-child(5),
+#login-credentials-table td:nth-child(5) {
+    width: 50px; /* 幅を狭くする */
+}
+
+/* テーブルセル内のテキストを確実に折り返す */
+#formset-table td,
+#login-credentials-table td {
+    word-break: break-word;     /* 単語内でも折り返しを許可 */
+    overflow-wrap: break-word;  /* 古いブラウザ向けのフォールバック */
+    white-space: normal;        /* 通常の折り返し */
+}
+
+/* 入力フィールドのスタイル強化 */
+#formset-table input,
+#login-credentials-table input,
+#formset-table textarea,
+#login-credentials-table textarea {
+    width: 100%;
+    box-sizing: border-box;
+    white-space: pre-wrap;      /* 改行や空白を保持して折り返す */
+    word-break: break-word;
+    overflow-wrap: break-word;
+    resize: vertical;           /* ユーザーが縦方向にリサイズ可能に */
+}
+
+.auto-resize-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    resize: none;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+}
+.modal button {
+    margin: 5px;
+}

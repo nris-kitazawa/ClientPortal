@@ -96,29 +96,20 @@ def edit_check_sheet(request, id):
         can_delete=True
     )
     
-    form_classes = [CheckSheetEditForm, SystemSummaryForm]
-    instances = [check_sheet, system_summary]
-    form_keys = ["form", "sys_form"]
-
     if request.method == "POST":
-        forms_list = [cls(request.POST, instance=inst) for cls, inst in zip(form_classes, instances)]
-        formset = AssessTargetFormSet(request.POST, queryset=AssessTarget.objects.filter(check_sheet=check_sheet))
-        login_formset = LoginCredentialFormSet(request.POST, queryset=check_sheet.login_credentials.all())
+        formset = AssessTargetFormSet(request.POST, queryset=AssessTarget.objects.filter(check_sheet=check_sheet), prefix="assess_target")
+        login_formset = LoginCredentialFormSet(request.POST, queryset=LoginCredential.objects.filter(check_sheet=check_sheet), prefix="login_credential")
         
-        if all(f.is_valid() for f in forms_list) and formset.is_valid() and login_formset.is_valid():
-            for f in forms_list:
-                f.save()
+        if formset.is_valid() and login_formset.is_valid():
             formset.save()
             login_formset.save()
             return redirect("check_sheet:detail", id=check_sheet.id)
     else:
-        forms_list = [cls(instance=inst) for cls, inst in zip(form_classes, instances)]
-        formset = AssessTargetFormSet(queryset=AssessTarget.objects.filter(check_sheet=check_sheet))
-        login_formset = LoginCredentialFormSet(queryset=check_sheet.login_credentials.all())
+        formset = AssessTargetFormSet(queryset=AssessTarget.objects.filter(check_sheet=check_sheet), prefix="assess_target")
+        login_formset = LoginCredentialFormSet(queryset=LoginCredential.objects.filter(check_sheet=check_sheet), prefix="login_credential")
 
-    context = dict(zip(form_keys, forms_list))
-    context["formset"] = formset
-    context["login_formset"] = login_formset
-    context["check_sheet"] = check_sheet
-
-    return render(request, "edit_check_sheet.html", context)
+    return render(request, "edit_check_sheet.html", {
+        "formset": formset,
+        "login_formset": login_formset,
+        "check_sheet": check_sheet,
+    })

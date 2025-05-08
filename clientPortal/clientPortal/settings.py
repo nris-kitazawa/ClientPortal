@@ -61,7 +61,6 @@ ROOT_URLCONF = 'clientPortal.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, x,'/templates') for x in APPS],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -72,6 +71,8 @@ TEMPLATES = [
         },
     },
 ]
+
+STATIC_URL = '/static/'
 
 WSGI_APPLICATION = 'clientPortal.wsgi.application'
 

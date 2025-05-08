@@ -42,12 +42,28 @@ class AssessTargetForm(BaseForm):
         model = AssessTarget
         fields = '__all__'
         exclude = ['check_sheet']
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget = forms.Textarea(attrs={
+                'class': 'auto-resize-textarea',
+                'rows': 1
+            })
 
 class LoginCredentialForm(BaseForm):
     class Meta:
         model = LoginCredential
         fields = '__all__'
         exclude = ['check_sheet']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget = forms.Textarea(attrs={
+                'class': 'auto-resize-textarea',
+                'rows': 1
+            })
 
 class CheckSheetDetailForm(BaseForm):
     class Meta:

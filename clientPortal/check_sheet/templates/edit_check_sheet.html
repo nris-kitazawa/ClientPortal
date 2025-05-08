@@ -1,5 +1,17 @@
 {% extends "base.html" %}
+
 {% block content %}
+
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/edit_check_sheet.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/edit_check_sheet.js' %}"></script>
+{% endblock %}
+
 <h2>チェックシート編集: {{ check_sheet.title }}</h2>
 <form method="post" id="edit-form">
     {% csrf_token %}
@@ -27,19 +39,6 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- 例の行を追加 -->
-                <tr class="example-row">
-                    <td>(例)</td>
-                    <td>http://www.nri-secure.co.jp</td>
-                    <td>www.nri-secure.co.jp</td>
-                    <td>RedHat Enterprise Linux 6.9</td>
-                    <td>Apache-2.2.15-59.el6</td>
-                    <td>tomcat6-6.0.24-105.el6_8</td>
-                    <td>Struts 2.5.10</td>
-                    <td>MySQL 5.7</td>
-                    <td></td>
-                </tr>
-                <!-- フォームセットの行 -->
                 {% for form in formset %}
                 <tr class="form-row">
                     <td>{{ forloop.counter }}</td>
@@ -60,190 +59,40 @@
         </table>
     </div>
     <button type="button" id="add-row-btn">1行追加</button>
+
+    <h2>Assess Login Credentials</h2>
+    {{ login_formset.management_form }}
+    <div id="login-credentials-table-container">
+        <table id="login-credentials-table" data-empty-form="{{ login_formset.empty_form.as_p|force_escape }}">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>ログインID</th>
+                    <th>パスワード</th>
+                    <th>権限</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for form in login_formset %}
+                <tr class="form-row">
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ form.login_id }}</td>
+                    <td>{{ form.password }}</td>
+                    <td>{{ form.role }}</td>
+                    <td>
+                        <button type="button" class="delete-row-btn">削除</button>
+                        {{ form.DELETE }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <button type="button" id="add-login-row-btn">1行追加</button>
+    <br>
     <button type="submit">保存</button>
-
-    
 </form>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const addRowBtn = document.getElementById("add-row-btn");
-        const formsetTable = document.getElementById("formset-table");
-        const totalFormsInput = document.querySelector("#id_form-TOTAL_FORMS");
-        const modal = document.getElementById("delete-confirm-modal");
-        const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
-        const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
-
-        let rowToDelete = null; // 削除対象の行を一時的に保存
-
-        // 「1行追加」ボタンの処理
-        addRowBtn.addEventListener("click", function () {
-            const currentFormCount = parseInt(totalFormsInput.value, 10);
-            const emptyFormTemplate = formsetTable.dataset.emptyForm.replace(/__prefix__/g, currentFormCount);
-
-            const newRow = document.createElement("tr");
-            newRow.classList.add("form-row");
-
-            const columns = [
-                "no", // No列を追加
-                "url_or_ip_address",
-                "host_name",
-                "os",
-                "web_server",
-                "ap_server",
-                "framework",
-                "db_server",
-                "DELETE"
-            ];
-
-            columns.forEach(column => {
-                const newCell = document.createElement("td");
-                if (column === "no") {
-                    // No列の値を設定
-                    newCell.textContent = currentFormCount + 1;
-                } else if (column === "DELETE") {
-                    const deleteButton = document.createElement("button");
-                    deleteButton.type = "button";
-                    deleteButton.classList.add("delete-row-btn");
-                    deleteButton.textContent = "削除";
-                    newCell.appendChild(deleteButton);
-
-                    const deleteInput = document.createElement("input");
-                    deleteInput.type = "checkbox";
-                    deleteInput.name = `form-${currentFormCount}-DELETE`;
-                    deleteInput.style.display = "none";
-                    newCell.appendChild(deleteInput);
-                } else {
-                    const parser = new DOMParser();
-                    const parsedHTML = parser.parseFromString(emptyFormTemplate, "text/html");
-                    const field = parsedHTML.querySelector(`[name*="${column}"]`);
-                    if (field) {
-                        newCell.appendChild(field);
-                    }
-                }
-                newRow.appendChild(newCell);
-            });
-
-            formsetTable.querySelector("tbody").appendChild(newRow);
-            totalFormsInput.value = currentFormCount + 1;
-
-            // No列を再計算
-            updateRowNumbers();
-        });
-
-        // No列を再計算する関数
-        function updateRowNumbers() {
-        const visibleRows = formsetTable.querySelectorAll("tbody tr.form-row");
-        let counter = 1;
-        visibleRows.forEach(row => {
-            if (row.style.display !== "none") {
-                const noCell = row.querySelector("td:first-child");
-                if (noCell) {
-                    noCell.textContent = counter++;
-                }
-            }
-        });
-}
-
-        // 削除ボタンの処理
-        formsetTable.addEventListener("click", function (event) {
-            if (event.target.classList.contains("delete-row-btn")) {
-                const row = event.target.closest("tr");
-                const inputs = row.querySelectorAll("input[name*='url_or_ip_address'], input[name*='host_name'], input[name*='os'], input[name*='web_server'], input[name*='ap_server'], input[name*='framework'], input[name*='db_server']");
-                let hasValue = false;
-
-                // 特定の列に値があるか確認
-                inputs.forEach(input => {
-                    if (input.value.trim() !== "") {
-                        hasValue = true;
-                    }
-                });
-
-                if (hasValue) {
-                    rowToDelete = row; // 削除対象の行を保存
-                    modal.style.display = "flex"; // モーダルを表示
-                } else {
-                    deleteRow(row); // 入力値がない場合は即削除
-                }
-            }
-        });
-
-        // モーダルの「削除」ボタンの処理
-        confirmDeleteBtn.addEventListener("click", function () {
-            if (rowToDelete) {
-                deleteRow(rowToDelete); // 行を削除
-                rowToDelete = null; // 削除対象をリセット
-            }
-            modal.style.display = "none"; // モーダルを非表示
-        });
-
-        // モーダルの「キャンセル」ボタンの処理
-        cancelDeleteBtn.addEventListener("click", function () {
-            rowToDelete = null; // 削除対象をリセット
-            modal.style.display = "none"; // モーダルを非表示
-        });
-
-        // 行を削除する関数
-        function deleteRow(row) {
-            const deleteInput = row.querySelector('input[name$="-DELETE"]');
-            if (deleteInput) {
-                deleteInput.checked = true; // 削除フラグを設定
-            }
-            row.style.display = "none"; // 行を非表示にする
-            updateRowNumbers(); // No列を再計算
-        }
-    });
-</script>
-
-<script>
-    function toggleOtherField() {
-        var radios = document.getElementsByName("environment");
-        var show = false;
-        for (var i = 0; i < radios.length; i++) {
-            if (radios[i].checked && radios[i].value === "other") {
-                show = true;
-            }
-        }
-        var otherField = document.getElementById("env_other_field");
-        otherField.display = show ? "block" : "none";
-        if (otherField) {
-            otherField.required = show;
-        }
-    }
-    window.addEventListener('DOMContentLoaded', function() {
-        toggleOtherField();
-        var radios = document.getElementsByName("environment");
-        for (var i = 0; i < radios.length; i++) {
-            radios[i].addEventListener('change', toggleOtherField);
-        }
-    });
-</script>
-
-<style>
-    input[type="checkbox"][name$="-DELETE"] {
-        display: none;
-    }
-
-    #formset-table-container {
-        overflow-x: auto; /* 横スクロールを有効にする */
-        white-space: nowrap; /* テーブルの列を折り返さない */
-    }
-
-    #formset-table {
-        width: 100%; /* テーブルを親要素の幅に合わせる */
-        border-collapse: collapse; /* セルの境界線を結合 */
-    }
-
-    #formset-table th, #formset-table td {
-        padding: 8px;
-        text-align: left;
-        border: 1px solid #ddd; /* セルの境界線 */
-    }
-
-    #formset-table th {
-        background-color: #f4f4f4; /* ヘッダーの背景色 */
-    }
-</style>
 
 <div id="delete-confirm-modal" class="modal" style="display: none;">
     <div class="modal-content">
@@ -252,29 +101,6 @@
         <button id="cancel-delete-btn" type="button">キャンセル</button>
     </div>
 </div>
-
-<style>
-    .modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    .modal-content {
-        background: white;
-        padding: 20px;
-        border-radius: 5px;
-        text-align: center;
-    }
-    .modal button {
-        margin: 5px;
-    }
-</style>
-
+  
 
 {% endblock %}
