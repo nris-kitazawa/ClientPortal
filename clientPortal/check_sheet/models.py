@@ -88,3 +88,13 @@ class LoginCredential(models.Model):
     login_id = models.CharField(max_length=255, verbose_name="ログインID")
     password = models.CharField(max_length=255, verbose_name="パスワード")
     role = models.CharField(max_length=255, verbose_name="権限")
+
+class RequiredQuestion(models.Model):
+    check_sheet = models.ForeignKey(CheckSheet, on_delete=models.CASCADE, related_name='required_questions')
+    ip_address_management = models.CharField(max_length=200, verbose_name='診断対象IPアドレスの運営組織について該当する物を選択してください。', choices=[('自社管理', '自社管理'), ('外部委託 (ホスティング)', '外部委託 (ホスティング)'), ('外部委託 (クラウドサービス)', '外部委託 (クラウドサービス)')], null=True)
+    outsourcing_info = models.CharField(max_length=200, verbose_name='前項Q1で「外部委託 (ホスティング)」または「外部委託 (クラウドサービス)」を回答された場合は、以下の事項にもご回答ください。外部委託先の情報をご回答ください。', null=True)
+    pre_application_required = models.BooleanField(verbose_name='利用している委託先によっては、セキュリティ診断の際に事前申請が必要な場合があります。事前申請が必要か、また既に申請が完了しているかご回答ください。', null=True)
+    pre_application_status = models.CharField(max_length=200, verbose_name='事前申請が必要か、また既に申請が完了しているかご回答ください。', choices=[('申請済み', '申請済み'), ('未申請', '未申請')], null=True)
+
+    def __str__(self):
+        return f"Required Question for {self.check_sheet.title}"

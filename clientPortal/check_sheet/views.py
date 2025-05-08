@@ -82,69 +82,95 @@ def edit_check_sheet(request, id):
 
     check_sheet = get_object_or_404(CheckSheet, id=id)
     system_summary, _ = SystemSummary.objects.get_or_create(check_sheet=check_sheet)
+    required_question, _ = RequiredQuestion.objects.get_or_create(check_sheet=check_sheet)
 
-    AssessTargetFormSet = modelformset_factory(
-        AssessTarget,
-        form=AssessTargetForm,
-        extra=1,
-        can_delete=True
-    )
-    LoginCredentialFormSet = modelformset_factory(
-        LoginCredential,
-        form=LoginCredentialForm,
-        extra=1,
-        can_delete=True
-    )
+    # --- フォームとフォームセットの定義をまとめる ---
+    form_configs = [
+        {
+            "type": "form",
+            "name": "check_sheet_form",
+            "form_class": CheckSheetEditForm,
+            "instance": check_sheet,
+        },
+        {
+            "type": "form",
+            "name": "system_summary_form",
+            "form_class": SystemSummaryForm,
+            "instance": system_summary,
+        },
+        {
+            "type": "formset",
+            "name": "formset",
+            "formset_class": modelformset_factory(
+                AssessTarget, form=AssessTargetForm, extra=1, can_delete=True
+            ),
+            "queryset": AssessTarget.objects.filter(check_sheet=check_sheet),
+            "prefix": "assess_target",
+            "assign_check_sheet": True,
+        },
+        {
+            "type": "formset",
+            "name": "login_formset",
+            "formset_class": modelformset_factory(
+                LoginCredential, form=LoginCredentialForm, extra=1, can_delete=True
+            ),
+            "queryset": LoginCredential.objects.filter(check_sheet=check_sheet),
+            "prefix": "login_credential",
+            "assign_check_sheet": True,
+        },
+        {
+            "type" : "form",
+            "name" : "required_question_form",
+            "form_class" : RequiredQuestionForm,
+            "instance" : required_question,
+        }
+    ]
+
+    context = {"check_sheet": check_sheet}
 
     if request.method == "POST":
-        check_sheet_form = CheckSheetEditForm(request.POST, instance=check_sheet)
-        system_summary_form = SystemSummaryForm(request.POST, instance=system_summary)
-        formset = AssessTargetFormSet(
-            request.POST,
-            queryset=AssessTarget.objects.filter(check_sheet=check_sheet),
-            prefix="assess_target"
-        )
-        login_formset = LoginCredentialFormSet(
-            request.POST,
-            queryset=LoginCredential.objects.filter(check_sheet=check_sheet),
-            prefix="login_credential"
-        )
+        all_valid = True
 
-        if check_sheet_form.is_valid() and system_summary_form.is_valid() and formset.is_valid() and login_formset.is_valid():
-            check_sheet_form.save()
-            system_summary_form.save()
+        for config in form_configs:
+            if config["type"] == "form":
+                form = config["form_class"](request.POST, instance=config["instance"])
+                context[config["name"]] = form
+                if not form.is_valid():
+                    all_valid = False
 
-            instances = formset.save(commit=False)
-            for obj in instances:
-                obj.check_sheet = check_sheet
-                obj.save()
-            for obj in formset.deleted_objects:
-                obj.delete()
+            elif config["type"] == "formset":
+                formset = config["formset_class"](
+                    request.POST,
+                    queryset=config["queryset"],
+                    prefix=config["prefix"]
+                )
+                context[config["name"]] = formset
+                if not formset.is_valid():
+                    all_valid = False
 
-            login_instances = login_formset.save(commit=False)
-            for obj in login_instances:
-                obj.check_sheet = check_sheet
-                obj.save()
-            for obj in login_formset.deleted_objects:
-                obj.delete()
+        if all_valid:
+            for config in form_configs:
+                if config["type"] == "form":
+                    context[config["name"]].save()
+                elif config["type"] == "formset":
+                    instances = context[config["name"]].save(commit=False)
+                    for obj in instances:
+                        if config.get("assign_check_sheet"):
+                            obj.check_sheet = check_sheet
+                        obj.save()
+                    for obj in context[config["name"]].deleted_objects:
+                        obj.delete()
 
             return redirect("check_sheet:detail", id=check_sheet.id)
-    else:
-        check_sheet_form = CheckSheetEditForm(instance=check_sheet)
-        system_summary_form = SystemSummaryForm(instance=system_summary)
-        formset = AssessTargetFormSet(
-            queryset=AssessTarget.objects.filter(check_sheet=check_sheet),
-            prefix="assess_target"
-        )
-        login_formset = LoginCredentialFormSet(
-            queryset=LoginCredential.objects.filter(check_sheet=check_sheet),
-            prefix="login_credential"
-        )
 
-    return render(request, "edit_check_sheet.html", {
-        "form": check_sheet_form,
-        "sys_form": system_summary_form,
-        "formset": formset,
-        "login_formset": login_formset,
-        "check_sheet": check_sheet,
-    })
+    else:
+        for config in form_configs:
+            if config["type"] == "form":
+                context[config["name"]] = config["form_class"](instance=config["instance"])
+            elif config["type"] == "formset":
+                context[config["name"]] = config["formset_class"](
+                    queryset=config["queryset"],
+                    prefix=config["prefix"]
+                )
+
+    return render(request, "edit_check_sheet.html", context)

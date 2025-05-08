@@ -16,10 +16,45 @@
 <form method="post" id="edit-form">
     {% csrf_token %}
     <h2>チェックシート（可能な範囲でご記入願います）</h2>
-    {{ form.as_table }}
+    <div class="hearing-table-container">
+        <table class="hearing-table">
+            <tbody>
+                {% for field in check_sheet_form %}
+                <tr>
+                    <td>{{ field.label_tag }}</td>
+                    <td>{{ field }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
     <h2>診断対象システムの概要</h2>
-    {{ sys_form.as_p }}
+    <div class="hearing-table-container">
+        <table class="hearing-table">
+            <tbody>
+                {% for field in system_summary_form %}
+                {% if field.name != "environment_other" %}
+                <tr>
+                    <td>{{ field.label_tag }}</td>
+                    <td>
+                        {% if field.name == "environment" %}
+                            <div class="radio-group">
+                                {{ field }}
+                                <span id="env-other-container" class="hidden">
+                                    {{ system_summary_form.environment_other }}
+                                </span>
+                            </div>
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
     <h2>診断対象情報</h2>
     {{ formset.management_form }}
@@ -91,7 +126,19 @@
     </div>
     <button type="button" id="add-login-row-btn">1行追加</button>
 
-    
+    <h2>診断対象に関するヒアリング事項（必須）</h2>
+    <div class="hearing-table-container">
+        <table class="hearing-table">
+            <tbody>
+                {% for field in required_question_form %}
+                <tr>
+                    <td>{{ field.label_tag }}</td>
+                    <td>{{ field }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
     <br>
     <button type="submit">保存</button>

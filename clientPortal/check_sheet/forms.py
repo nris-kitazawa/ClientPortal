@@ -5,8 +5,16 @@ from django.forms import modelformset_factory
 
 class BaseForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        kwargs.setdefault('label_suffix', '')
         super().__init__(*args, **kwargs)
+        # フォームのラベルのサフィックスを空に設定
+        kwargs.setdefault('label_suffix', '')
+        # RadioSelectの初期値をNoneに設定
+        for field_name, field in self.fields.items():
+            if isinstance(field.widget, forms.RadioSelect):
+                self.fields[field_name].empty_label = None
+                self.fields[field_name].initial = None
+                field.choices = [(choice[0], choice[1]) for choice in field.choices if choice[0] != '']
+        
 
 class CheckSheetForm(BaseForm):
     class Meta:
@@ -74,3 +82,13 @@ class CheckSheetDetailForm(BaseForm):
         super().__init__(*args, **kwargs) 
         for field in self.fields.values():
             field.disabled = True
+
+class RequiredQuestionForm(BaseForm):
+    class Meta:
+        model = RequiredQuestion
+        fields = '__all__'
+        exclude = ['check_sheet']
+        widgets = {
+            'ip_address_management': forms.RadioSelect,
+            'pre_application_status': forms.RadioSelect,
+        }

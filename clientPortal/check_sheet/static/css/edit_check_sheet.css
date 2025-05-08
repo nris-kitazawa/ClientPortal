@@ -108,3 +108,47 @@ input[type="checkbox"][name$="-DELETE"] {
 .modal button {
     margin: 5px;
 }
+
+/* ヒアリングテーブルのスタイル */
+.hearing-table-container {
+    margin-top: 20px;
+    overflow-x: auto; /* 横スクロールを有効にする */
+}
+
+.hearing-table {
+    width: 100%;
+    border-collapse: collapse; /* セルの境界線を結合 */
+    table-layout: fixed; /* 列幅を固定 */
+}
+
+.hearing-table th,
+.hearing-table td {
+    border: 1px solid #ddd; /* セルの境界線 */
+    padding: 10px;
+    text-align: left;
+    vertical-align: top; /* テキストを上揃え */
+    word-wrap: break-word; /* 長い単語を折り返す */
+}
+
+.hearing-table th {
+    background-color: #f4f4f4; /* ヘッダーの背景色 */
+    font-weight: bold;
+}
+
+/* その他 */
+.radio-group {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* ラジオボタンと入力フィールドの間隔 */
+}
+
+.hidden {
+    display: none; /* 初期状態で非表示 */
+}
+
+#env-other-container input {
+    width: 200px; /* 入力フィールドの幅 */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px;
+}
