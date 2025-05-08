@@ -2,8 +2,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User, Group
 from django.http import HttpResponseForbidden
-from .forms import CheckSheetForm, CheckSheetDetailForm, CheckSheetEditForm
-from .models import CheckSheet
+from .forms import *
+from .models import *
 from core.functions.userCheckHelper import is_guest_user
 from core.functions.decorator import guest_forbidden
 import random
@@ -79,17 +79,37 @@ def check_sheet_detail(request, id):
 def edit_check_sheet(request, id):
     if is_guest_user(request.user) and request.user.username != id:
         return HttpResponseForbidden("このページは対応するNRIS社員またはゲストユーザーのみがアクセスできます。")
+    
     check_sheet = get_object_or_404(CheckSheet, id=id)
+    system_summary, _ = SystemSummary.objects.get_or_create(check_sheet=check_sheet)
+    
+    AssessTargetFormSet = modelformset_factory(
+        AssessTarget,
+        form=AssessTargetForm,
+        extra=1,
+        can_delete=True
+    )
+    form_classes = [CheckSheetEditForm, SystemSummaryForm]
+    instances = [check_sheet, system_summary]
+    form_keys = ["form", "sys_form"]
 
     if request.method == "POST":
-        form = CheckSheetEditForm(request.POST, instance=check_sheet)
-        if form.is_valid():
-            form.save()
+        forms_list = [cls(request.POST, instance=inst) for cls, inst in zip(form_classes, instances)]
+        formset = AssessTargetFormSet(request.POST, queryset=AssessTarget.objects.filter(check_sheet=check_sheet))
+        
+        if all(f.is_valid() for f in forms_list) and formset.is_valid():
+            for f in forms_list:
+                f.save()
+            formset.save()
             return redirect("check_sheet:detail", id=check_sheet.id)
     else:
-        form = CheckSheetEditForm(instance=check_sheet)
+        forms_list = [cls(instance=inst) for cls, inst in zip(form_classes, instances)]
+        formset = AssessTargetFormSet(queryset=AssessTarget.objects.filter(check_sheet=check_sheet))
 
-    return render(request, "edit_check_sheet.html", {"form": form, "check_sheet": check_sheet})
+    context = dict(zip(form_keys, forms_list))
+    context["formset"] = formset
+    context["check_sheet"] = check_sheet
 
+    return render(request, "edit_check_sheet.html", context)
 
 

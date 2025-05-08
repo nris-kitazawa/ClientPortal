@@ -1,12 +1,105 @@
 {% extends "base.html" %}
-
 {% block content %}
 <h2>チェックシート編集: {{ check_sheet.title }}</h2>
-
-<form method="post">
+<form method="post" id="edit-form">
     {% csrf_token %}
+    <h2>Check Sheet</h2>
     {{ form.as_p }}
-    <a href="{% url 'check_sheet:detail' check_sheet.id %}" class="btn btn-secondary">キャンセル</a>
-    <button type="submit" class="btn btn-success">保存する</button>
+
+    <h2>System Summary</h2>
+    {{ sys_form.as_p }}
+
+    <h2>Assess Targets</h2>
+    {{ formset.management_form }}
+    <table id="formset-table" data-empty-form="{{ formset.empty_form.as_p|force_escape }}">
+        {% for form in formset %}
+            <tr class="form-row">
+                <td>{{ form.as_p }}</td>
+                {% if form.instance.pk %}
+                    <td>
+                        <label for="{{ form.DELETE.id_for_label }}">削除</label>
+                        {{ form.DELETE }}
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
+    <button type="button" id="add-row-btn">1行追加</button>
+    <button type="submit">保存</button>
 </form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const addRowBtn = document.getElementById("add-row-btn");
+        const formsetTable = document.getElementById("formset-table");
+        const totalFormsInput = document.querySelector("#id_form-TOTAL_FORMS");
+
+        // 「1行追加」ボタンの処理
+        addRowBtn.addEventListener("click", function () {
+            // 現在のフォーム数を取得
+            const currentFormCount = parseInt(totalFormsInput.value, 10);
+
+            // 新しいフォームのHTMLを作成
+            const emptyFormTemplate = formsetTable.dataset.emptyForm.replace(/__prefix__/g, currentFormCount);
+
+            // 新しい行を作成
+            const newRow = document.createElement("tr");
+            newRow.classList.add("form-row");
+
+            // 新しいセルを作成してフォームを追加
+            const newCell = document.createElement("td");
+            newCell.innerHTML = emptyFormTemplate;
+            newRow.appendChild(newCell);
+
+            // テーブルに新しい行を追加
+            formsetTable.appendChild(newRow);
+
+            // フォーム数を更新
+            totalFormsInput.value = currentFormCount + 1;
+        });
+
+        // 削除チェックボックスの処理
+        formsetTable.addEventListener("change", function (event) {
+            if (event.target.type === "checkbox" && event.target.name.includes("DELETE")) {
+                const row = event.target.closest("tr");
+                if (event.target.checked) {
+                    row.style.display = "none"; // 行を非表示にする
+                    // 削除された行の入力値をクリア
+                    const inputs = row.querySelectorAll("input, select, textarea");
+                    inputs.forEach(input => {
+                        if (!input.name.includes("DELETE")) {
+                            input.value = ""; // 入力値をクリア
+                        }
+                    });
+                } else {
+                    row.style.display = ""; // 行を再表示する
+                }
+            }
+        });
+    });
+</script>
+
+<script>
+    function toggleOtherField() {
+        var radios = document.getElementsByName("environment");
+        var show = false;
+        for (var i = 0; i < radios.length; i++) {
+            if (radios[i].checked && radios[i].value === "other") {
+                show = true;
+            }
+        }
+        var otherField = document.getElementById("env_other_field");
+        otherField.display = show ? "block" : "none";
+        if (otherField) {
+            otherField.required = show;
+        }
+    }
+    window.addEventListener('DOMContentLoaded', function() {
+        toggleOtherField();
+        var radios = document.getElementsByName("environment");
+        for (var i = 0; i < radios.length; i++) {
+            radios[i].addEventListener('change', toggleOtherField);
+        }
+    });
+</script>
 {% endblock %}
