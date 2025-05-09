@@ -102,7 +102,7 @@ def edit_check_sheet(request, id):
             "type": "formset",
             "name": "formset",
             "formset_class": modelformset_factory(
-                AssessTarget, form=AssessTargetForm, extra=1, can_delete=True
+                AssessTarget, form=AssessTargetForm, extra=1 if AssessTarget.objects.filter(check_sheet=check_sheet).count() == 0 else 0,  # extra を動的に設定, can_delete=True
             ),
             "queryset": AssessTarget.objects.filter(check_sheet=check_sheet),
             "prefix": "assess_target",
@@ -112,7 +112,7 @@ def edit_check_sheet(request, id):
             "type": "formset",
             "name": "login_formset",
             "formset_class": modelformset_factory(
-                LoginCredential, form=LoginCredentialForm, extra=1, can_delete=True
+                LoginCredential, form=LoginCredentialForm, extra=1 if LoginCredential.objects.filter(check_sheet=check_sheet).count() == 0 else 0, can_delete=True
             ),
             "queryset": LoginCredential.objects.filter(check_sheet=check_sheet),
             "prefix": "login_credential",
@@ -127,7 +127,6 @@ def edit_check_sheet(request, id):
     ]
 
     context = {"check_sheet": check_sheet}
-
     if request.method == "POST":
         all_valid = True
 

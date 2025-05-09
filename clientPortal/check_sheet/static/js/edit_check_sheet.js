@@ -2,8 +2,8 @@ document.addEventListener("DOMContentLoaded", function () {
     setupFormsetTable({
         tableId: "formset-table",
         addButtonId: "add-row-btn",
-        totalFormsSelector: "#id_assess_target-TOTAL_FORMS",
-        prefix: "assess_target",
+        totalFormsSelector: "#id_form-TOTAL_FORMS",
+        prefix: "form",
         columns: [
             "url_or_ip_address",
             "host_name",
@@ -18,8 +18,8 @@ document.addEventListener("DOMContentLoaded", function () {
     setupFormsetTable({
         tableId: "login-credentials-table",
         addButtonId: "add-login-row-btn",
-        totalFormsSelector: "#id_login_credential-TOTAL_FORMS",
-        prefix: "login_credential",
+        totalFormsSelector: "#id_login_form-TOTAL_FORMS",
+        prefix: "login_form",
         columns: [
             "login_id",
             "password",
@@ -35,26 +35,41 @@ function setupFormsetTable({ tableId, addButtonId, totalFormsSelector, prefix, c
     const addButton = document.getElementById(addButtonId);
     const totalFormsInput = document.querySelector(totalFormsSelector);
 
+    // 初期表示後にNo欄を再計算
+    updateAllRowNumbers(table);
+
+    // 行を削除する関数
+    function deleteRow(row) {
+        const deleteInput = row.querySelector(`input[name$="-DELETE"]`);
+        if (deleteInput) {
+            deleteInput.checked = true; // 削除フラグを設定
+        }
+        row.style.display = "none"; // 行を非表示にする
+        updateAllRowNumbers(table); // No欄を再計算
+    }
+
+    // 削除ボタンのイベントリスナーを設定
+    table.addEventListener("click", function (event) {
+        if (event.target.classList.contains("delete-row-btn")) {
+            const row = event.target.closest("tr");
+            if (row) {
+                deleteRow(row);
+            }
+        }
+    });
+
+    // 行を追加する処理
     addButton.addEventListener("click", function () {
         const currentFormCount = parseInt(totalFormsInput.value, 10);
-        const emptyFormTemplate = table.dataset.emptyForm.replace(/__prefix__/g, currentFormCount);
-
         const newRow = document.createElement("tr");
         newRow.classList.add("form-row");
 
-        const noCell = document.createElement("td");
-        noCell.textContent = currentFormCount + 1;
-        newRow.appendChild(noCell);
-
-        const parser = new DOMParser();
-        const parsedHTML = parser.parseFromString(emptyFormTemplate, "text/html");
-
         columns.forEach(column => {
             const newCell = document.createElement("td");
-            const field = parsedHTML.querySelector(`[name*="${column}"]`);
-            if (field) {
-                newCell.appendChild(field);
-            }
+            const field = document.createElement("input");
+            field.name = `${prefix}-${currentFormCount}-${column}`;
+            field.type = "text";
+            newCell.appendChild(field);
             newRow.appendChild(newCell);
         });
 
@@ -77,7 +92,18 @@ function setupFormsetTable({ tableId, addButtonId, totalFormsSelector, prefix, c
         table.querySelector("tbody").appendChild(newRow);
         totalFormsInput.value = currentFormCount + 1;
 
-        updateAllRowNumbers(table);
+        updateAllRowNumbers(table); // No欄を再計算
+    });
+}
+
+// No欄を再計算する関数
+function updateAllRowNumbers(table) {
+    const rows = table.querySelectorAll(".form-row:not([style*='display: none'])");
+    rows.forEach((row, index) => {
+        const noCell = row.querySelector("td:first-child");
+        if (noCell) {
+            noCell.textContent = index + 1;
+        }
     });
 }
 
@@ -135,16 +161,6 @@ function deleteRow(row) {
     updateAllRowNumbers(table);
 }
 
-function updateAllRowNumbers(table) {
-    const rows = table.querySelectorAll(".form-row:not([style*='display: none'])");
-    rows.forEach((row, index) => {
-        const noCell = row.querySelector("td:first-child");
-        if (noCell) {
-            noCell.textContent = index + 1;
-        }
-    });
-}
-
 function toggleOtherField() {
     var radios = document.getElementsByName("environment");
     var otherContainer = document.getElementById("env-other-container");
@@ -167,17 +183,6 @@ function toggleOtherField() {
         }
     }
 }
-
-// DOMContentLoaded イベントで初期化
-window.addEventListener('DOMContentLoaded', function () {
-    toggleOtherField(); // 初期状態を設定
-    var radios = document.getElementsByName("environment");
-
-    // ラジオボタンの変更イベントを監視
-    for (var i = 0; i < radios.length; i++) {
-        radios[i].addEventListener('change', toggleOtherField);
-    }
-});
 
 // DOMContentLoaded イベントで初期化
 window.addEventListener('DOMContentLoaded', function () {

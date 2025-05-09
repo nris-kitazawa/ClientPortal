@@ -81,7 +81,7 @@ class AssessTarget(models.Model):
 
 class LoginCredential(models.Model):
     check_sheet = models.ForeignKey(
-        'CheckSheet', 
+        CheckSheet, 
         on_delete=models.CASCADE, 
         related_name='login_credentials'
     )
