@@ -141,7 +141,6 @@ class RequiredQuestionForm(BaseForm):
     
 class PreparedDocsForm(BaseForm):
 
-    
     class Meta:
         model = PreparedDocs
         fields = '__all__'
@@ -192,3 +191,17 @@ class AssessScheduleForm(BaseForm):
             raise forms.ValidationError('連絡は必要としてください。')
 
         return cleaned_data
+
+class MemberForm(BaseForm):
+    class Meta:
+        model = Member
+        fields = '__all__'
+        exclude = ['check_sheet']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget = forms.Textarea(attrs={
+                'class': 'auto-resize-textarea',
+                'rows': 1
+            })

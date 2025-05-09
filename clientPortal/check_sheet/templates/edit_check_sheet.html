@@ -59,7 +59,7 @@
     <h2>診断対象情報</h2>
     {{ formset.management_form }}
     <div id="formset-table-container">
-        <table id="formset-table" data-empty-form="{{ formset.empty_form.as_p|force_escape }}">
+        <table id="formset-table" class="formset-table" data-empty-form="{{ formset.empty_form.as_p|force_escape }}">
             <thead>
                 <tr>
                     <th>No</th>
@@ -73,7 +73,7 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="id_form-TOTAL_FORMS">
                 {% for form in formset %}
                 <tr class="form-row" style="{% if form.DELETE.value %}display: none;{% endif %}">
                     <td>{{ forloop.counter }}</td>
@@ -87,19 +87,18 @@
                     {{ form.id }}
                     <td>
                         <button type="button" class="delete-row-btn">削除</button>
-                        {{ form.DELETE }}
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-    </div>
     <button type="button" id="add-row-btn">1行追加</button>
+    </div>
 
     <h2>診断用認証情報（認証有のアプリケーションでは必須）</h2>
     {{ login_formset.management_form }}
     <div id="login-credentials-table-container">
-        <table id="login-credentials-table" data-empty-form="{{ login_formset.empty_form.as_p|force_escape }}">
+        <table id="login-credentials-table" class="formset-table" data-empty-form="{{ login_formset.empty_form.as_p|force_escape }}">
             <thead>
                 <tr>
                     <th>No</th>
@@ -109,9 +108,9 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="id_login_form-TOTAL_FORMS">
                 {% for form in login_formset %}
-                <tr class="form-row" style="{% if form.DELETE.value %}display: none;{% endif %}">
+                <tr class="form-row"  style="{% if form.DELETE.value %}display: none;{% endif %}">
                     <td>{{ forloop.counter }}</td>
                     <td>{{ form.login_id }}</td>
                     <td>{{ form.password }}</td>
@@ -119,14 +118,14 @@
                     {{ form.id }}
                     <td>
                         <button type="button" class="delete-row-btn">削除</button>
-                        {{ form.DELETE }}
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-    </div>
     <button type="button" id="add-login-row-btn">1行追加</button>
+    </div>
+
 
     <h2>診断対象に関するヒアリング事項（必須）</h2>
     <div class="hearing-table-container">
@@ -198,6 +197,42 @@
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+
+
+    <h2>実施体制</h2>
+    {{ member_formset.management_form }}
+    <div id="member-table-container">
+        <table id="member-table" class="formset-table" data-empty-form="{{ member_formset.empty_form.as_p|force_escape }}">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>会社</th>
+                    <th>氏名</th>
+                    <th>部署名</th>
+                    <th>電話番号1</th>
+                    <th>電話番号2</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="id_member_form-TOTAL_FORMS">
+                {% for form in member_formset %}
+                <tr class="form-row" style="{% if form.DELETE.value %}display: none;{% endif %}">
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ form.company_name }}</td>
+                    <td>{{ form.member_name }}</td>
+                    <td>{{ form.department_name }}</td>
+                    <td>{{ form.phone_number_1 }}</td>
+                    <td>{{ form.phone_number_2 }}</td>
+                    {{ form.id }}
+                    <td>
+                        <button type="button" class="delete-row-btn">削除</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+         <button type="button" id="add-member-row-btn">1行追加</button>
     </div>
 
     <br>

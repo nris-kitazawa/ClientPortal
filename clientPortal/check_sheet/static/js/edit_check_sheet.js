@@ -1,3 +1,4 @@
+/* ラジオボタンの選択値を取得する関数 */
 function getSelectedValue(radioButtons) {
     for (const radio of radioButtons) {
         if (radio.checked) {
@@ -7,6 +8,7 @@ function getSelectedValue(radioButtons) {
     return null;
 }
 
+// Formsetのテーブルを設定する関数
 document.addEventListener("DOMContentLoaded", function () {
     setupFormsetTable({
         tableId: "formset-table",
@@ -14,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
         totalFormsSelector: "#id_form-TOTAL_FORMS",
         prefix: "form",
         columns: [
+            "no",
             "url_or_ip_address",
             "host_name",
             "os",
@@ -28,11 +31,27 @@ document.addEventListener("DOMContentLoaded", function () {
         tableId: "login-credentials-table",
         addButtonId: "add-login-row-btn",
         totalFormsSelector: "#id_login_form-TOTAL_FORMS",
-        prefix: "login_form",
+        prefix: "login_credential",
         columns: [
+            "no",
             "login_id",
             "password",
             "role"
+        ]
+    });
+
+    setupFormsetTable({
+        tableId: "member-table",
+        addButtonId: "add-member-row-btn",
+        totalFormsSelector: "#id_member_form-TOTAL_FORMS",
+        prefix: "member",
+        columns: [
+            "no",
+            "company_name",
+            "member_name",
+            "department_name",
+            "phone_number_1",
+            "phone_number_2"
         ]
     });
 
@@ -42,66 +61,47 @@ document.addEventListener("DOMContentLoaded", function () {
 function setupFormsetTable({ tableId, addButtonId, totalFormsSelector, prefix, columns }) {
     const table = document.getElementById(tableId);
     const addButton = document.getElementById(addButtonId);
-    const totalFormsInput = document.querySelector(totalFormsSelector);
-
-    // 初期表示後にNo欄を再計算
-    updateAllRowNumbers(table);
-
-    // 行を削除する関数
-    function deleteRow(row) {
-        const deleteInput = row.querySelector(`input[name$="-DELETE"]`);
-        if (deleteInput) {
-            deleteInput.checked = true; // 削除フラグを設定
-        }
-        row.style.display = "none"; // 行を非表示にする
-        updateAllRowNumbers(table); // No欄を再計算
-    }
-
-    // 削除ボタンのイベントリスナーを設定
-    table.addEventListener("click", function (event) {
-        if (event.target.classList.contains("delete-row-btn")) {
-            const row = event.target.closest("tr");
-            if (row) {
-                deleteRow(row);
-            }
-        }
-    });
+    updateAllRowNumbers(table); // 初期状態でNo欄を再計算
 
     // 行を追加する処理
     addButton.addEventListener("click", function () {
-        const currentFormCount = parseInt(totalFormsInput.value, 10);
+        const totalFormsInput = document.querySelector(totalFormsSelector).querySelectorAll(".form-row");
+        var currentFormCount = parseInt(totalFormsInput.length, 10);
         const newRow = document.createElement("tr");
         newRow.classList.add("form-row");
 
-        columns.forEach(column => {
-            const newCell = document.createElement("td");
-            const field = document.createElement("input");
-            field.name = `${prefix}-${currentFormCount}-${column}`;
-            field.type = "text";
-            newCell.appendChild(field);
-            newRow.appendChild(newCell);
-        });
+    columns.forEach(column => {
+        const newCell = document.createElement("td");
+        const field = document.createElement("textarea");
+        field.name = `${prefix}-${currentFormCount}-${column}`;
+        field.id = `id_${prefix}-${currentFormCount}-${column}`;
+        field.classList.add("auto-resize-textarea");
+        field.rows = 1; // 初期行数を1に設定 
+        newCell.appendChild(field);
+        newRow.appendChild(newCell);
+    });
 
-        // 削除ボタンとhidden削除フラグ
-        const deleteCell = document.createElement("td");
-        const deleteButton = document.createElement("button");
-        deleteButton.type = "button";
-        deleteButton.classList.add("delete-row-btn");
-        deleteButton.textContent = "削除";
-        deleteCell.appendChild(deleteButton);
 
-        const deleteInput = document.createElement("input");
-        deleteInput.type = "checkbox";
-        deleteInput.name = `${prefix}-${currentFormCount}-DELETE`;
-        deleteInput.style.display = "none";
-        deleteCell.appendChild(deleteInput);
+    // 削除ボタンとhidden削除フラグ
+    const deleteCell = document.createElement("td");
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.classList.add("delete-row-btn");
+    deleteButton.textContent = "削除";
+    deleteCell.appendChild(deleteButton);
 
-        newRow.appendChild(deleteCell);
+    const deleteInput = document.createElement("input");
+    deleteInput.type = "checkbox";
+    deleteInput.name = `${prefix}-${currentFormCount}-DELETE`;
+    deleteInput.style.display = "none";
+    deleteCell.appendChild(deleteInput);
 
-        table.querySelector("tbody").appendChild(newRow);
-        totalFormsInput.value = currentFormCount + 1;
+    newRow.appendChild(deleteCell);
 
-        updateAllRowNumbers(table); // No欄を再計算
+    table.querySelector("tbody").appendChild(newRow);
+    currentFormCount = currentFormCount + 1;
+
+    updateAllRowNumbers(table); // No欄を再計算
     });
 }
 
@@ -116,6 +116,8 @@ function updateAllRowNumbers(table) {
     });
 }
 
+
+// 削除確認モーダルの設定
 function setupDeleteModal(modalId, confirmBtnId, cancelBtnId) {
     const modal = document.getElementById(modalId);
     const confirmDeleteBtn = document.getElementById(confirmBtnId);
@@ -135,7 +137,6 @@ function setupDeleteModal(modalId, confirmBtnId, cancelBtnId) {
             const hasValue = [...inputs].some(input =>
                 !input.name.includes("-DELETE") && input.value.trim() !== ""
             );
-
             if (hasValue) {
                 rowToDelete = row;
                 modal.style.display = "flex";
@@ -160,6 +161,7 @@ function setupDeleteModal(modalId, confirmBtnId, cancelBtnId) {
 }
 
 function deleteRow(row) {
+    console.log("deleteRow called with row:", row); // デバッグ用
     const deleteInput = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
     if (deleteInput) {
         deleteInput.checked = true;
@@ -256,8 +258,6 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function() {
     const extensionContactField = document.querySelectorAll('input[name="extension_contact"]');
     const extensionContinueFieldRow = document.querySelector('input[name="extension_continue"]').closest('tr');
-    console.log('extensionContactField:', extensionContactField); // デバッグ用
-    console.log('extensionContinueFieldRow:', extensionContinueFieldRow); // デバッグ用
 
     function toggleExtensionContinueField() {
         if (extensionContactField[0].checked) {
@@ -266,7 +266,7 @@ document.addEventListener('DOMContentLoaded', function() {
             extensionContinueFieldRow.style.display = 'none';
         }
     }
-    
+
     extensionContactField.forEach(radio => {
         radio.addEventListener('change', toggleExtensionContinueField);
     });

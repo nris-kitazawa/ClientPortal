@@ -1,6 +1,8 @@
 # check_sheet/models.py
 from django.db import models
 from django.contrib.auth.models import User
+
+from django.core.validators import RegexValidator
 import random
 import string
 import uuid
@@ -121,3 +123,12 @@ class AssessSchedule(models.Model):
 
     def __str__(self):
         return f"Assessment Schedule for {self.check_sheet.title}"
+
+class Member(models.Model):
+    check_sheet = models.ForeignKey(CheckSheet, on_delete=models.CASCADE, related_name='members')
+    company_name = models.CharField(max_length=200, verbose_name='会社', null=True)
+    member_name = models.CharField(max_length=200, verbose_name='氏名', null=True)
+    department_name = models.CharField(max_length=200, verbose_name='部署名', null=True)  
+    phone_number_1 = models.CharField(max_length=17, null=True, blank=True)
+    phone_number_2 = models.CharField(max_length=17, null=True, blank=True)
+

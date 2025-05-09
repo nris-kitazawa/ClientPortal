@@ -138,9 +138,20 @@ def edit_check_sheet(request, id):
             "form_class": AssessScheduleForm,
             "instance": assess_schedule,
         },
+        {
+            "type": "formset",
+            "name": "member_formset",
+            "formset_class": modelformset_factory(
+                Member, form=MemberForm, extra=1 if Member.objects.filter(check_sheet=check_sheet).count() == 0 else 0, can_delete=True
+            ),
+            "queryset": Member.objects.filter(check_sheet=check_sheet),
+            "prefix": "member",
+            "assign_check_sheet": True,
+        },
     ]
 
     context = {"check_sheet": check_sheet}
+
     if request.method == "POST":
         all_valid = True
 
@@ -152,6 +163,7 @@ def edit_check_sheet(request, id):
                     all_valid = False
 
             elif config["type"] == "formset":
+                print("config", config["queryset"])
                 formset = config["formset_class"](
                     request.POST,
                     queryset=config["queryset"],
@@ -167,7 +179,9 @@ def edit_check_sheet(request, id):
                     context[config["name"]].save()
                 elif config["type"] == "formset":
                     instances = context[config["name"]].save(commit=False)
+
                     for obj in instances:
+                        print(config["name"], obj)
                         if config.get("assign_check_sheet"):
                             obj.check_sheet = check_sheet
                         obj.save()
