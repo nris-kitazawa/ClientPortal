@@ -73,7 +73,7 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody id="id_form-TOTAL_FORMS">
+            <tbody>
                 {% for form in formset %}
                 <tr class="form-row" style="{% if form.DELETE.value %}display: none;{% endif %}">
                     <td>{{ forloop.counter }}</td>
@@ -108,7 +108,7 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody id="id_login_form-TOTAL_FORMS">
+            <tbody>
                 {% for form in login_formset %}
                 <tr class="form-row"  style="{% if form.DELETE.value %}display: none;{% endif %}">
                     <td>{{ forloop.counter }}</td>
@@ -215,7 +215,7 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody id="id_member_form-TOTAL_FORMS">
+            <tbody>
                 {% for form in member_formset %}
                 <tr class="form-row" style="{% if form.DELETE.value %}display: none;{% endif %}">
                     <td>{{ forloop.counter }}</td>

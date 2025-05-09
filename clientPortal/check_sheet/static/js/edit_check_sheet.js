@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setupFormsetTable({
         tableId: "formset-table",
         addButtonId: "add-row-btn",
-        totalFormsSelector: "#id_form-TOTAL_FORMS",
+        totalFormsSelector: "#id_assess_target-TOTAL_FORMS",
         prefix: "form",
         columns: [
             "no",
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setupFormsetTable({
         tableId: "login-credentials-table",
         addButtonId: "add-login-row-btn",
-        totalFormsSelector: "#id_login_form-TOTAL_FORMS",
+        totalFormsSelector: "#id_login-credentials-TOTAL_FORMS",
         prefix: "login_credential",
         columns: [
             "no",
@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setupFormsetTable({
         tableId: "member-table",
         addButtonId: "add-member-row-btn",
-        totalFormsSelector: "#id_member_form-TOTAL_FORMS",
+        totalFormsSelector: "#id_member-TOTAL_FORMS",
         prefix: "member",
         columns: [
             "no",
@@ -65,8 +65,10 @@ function setupFormsetTable({ tableId, addButtonId, totalFormsSelector, prefix, c
 
     // 行を追加する処理
     addButton.addEventListener("click", function () {
-        const totalFormsInput = document.querySelector(totalFormsSelector).querySelectorAll(".form-row");
-        var currentFormCount = parseInt(totalFormsInput.length, 10);
+        const totalFormsInput = document.querySelector(totalFormsSelector);
+        console.log("totalFormsInput:", totalFormsInput); // デバッグ用
+        var currentFormCount = parseInt(totalFormsInput.value, 10);
+        console.log("currentFormCount:", currentFormCount); // デバッグ用
         const newRow = document.createElement("tr");
         newRow.classList.add("form-row");
 
@@ -100,6 +102,7 @@ function setupFormsetTable({ tableId, addButtonId, totalFormsSelector, prefix, c
 
     table.querySelector("tbody").appendChild(newRow);
     currentFormCount = currentFormCount + 1;
+    totalFormsInput.value = currentFormCount; // フォームの総数を更新
 
     updateAllRowNumbers(table); // No欄を再計算
     });

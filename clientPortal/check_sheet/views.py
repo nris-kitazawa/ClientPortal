@@ -163,7 +163,6 @@ def edit_check_sheet(request, id):
                     all_valid = False
 
             elif config["type"] == "formset":
-                print("config", config["queryset"])
                 formset = config["formset_class"](
                     request.POST,
                     queryset=config["queryset"],
