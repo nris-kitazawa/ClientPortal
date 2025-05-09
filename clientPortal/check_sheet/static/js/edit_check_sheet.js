@@ -1,3 +1,12 @@
+function getSelectedValue(radioButtons) {
+    for (const radio of radioButtons) {
+        if (radio.checked) {
+            return radio.value;
+        }
+    }
+    return null;
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     setupFormsetTable({
         tableId: "formset-table",
@@ -210,26 +219,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const preApplicationStatusRow = document.getElementById('pre-application-status-row');
     const preApplicationRequiredField = document.querySelectorAll('input[name="pre_application_required"]'); // 修正ポイント
 
-    function getSelectedValue(radioButtons) {
-        for (const radio of radioButtons) {
-            if (radio.checked) {
-                return radio.value;
-            }
-        }
-        return null;
-    }
-
     function toggleFields() {
         const selectedValue = getSelectedValue(ipAddressManagementField);
-        console.log('Selected value (ip_address_management):', selectedValue); // デバッグ用
 
         if (selectedValue !== '自社管理') {
             outsourcingInfoRow.style.display = '';
             preApplicationRequiredRow.style.display = '';
 
             const preApplicationRequiredValue = getSelectedValue(preApplicationRequiredField); // 修正ポイント
-            console.log('Selected value (pre_application_required):', preApplicationRequiredValue); // デバッグ用
-
             if (preApplicationRequiredValue === 'True') {
                 preApplicationStatusRow.style.display = '';
             } else {
@@ -252,4 +249,28 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     toggleFields(); // 初期状態を設定
+});
+
+
+// Q5の質問分岐の処理
+document.addEventListener('DOMContentLoaded', function() {
+    const extensionContactField = document.querySelectorAll('input[name="extension_contact"]');
+    const extensionContinueFieldRow = document.querySelector('input[name="extension_continue"]').closest('tr');
+    console.log('extensionContactField:', extensionContactField); // デバッグ用
+    console.log('extensionContinueFieldRow:', extensionContinueFieldRow); // デバッグ用
+
+    function toggleExtensionContinueField() {
+        if (extensionContactField[0].checked) {
+            extensionContinueFieldRow.style.display = '';
+        } else {
+            extensionContinueFieldRow.style.display = 'none';
+        }
+    }
+    
+    extensionContactField.forEach(radio => {
+        radio.addEventListener('change', toggleExtensionContinueField);
+    });
+
+    // Initial check
+    toggleExtensionContinueField();
 });

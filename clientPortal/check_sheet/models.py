@@ -80,11 +80,7 @@ class AssessTarget(models.Model):
     db_server = models.CharField(max_length=200, verbose_name='DBサーバ', null=True)
 
 class LoginCredential(models.Model):
-    check_sheet = models.ForeignKey(
-        CheckSheet, 
-        on_delete=models.CASCADE, 
-        related_name='login_credentials'
-    )
+    check_sheet = models.ForeignKey(CheckSheet, on_delete=models.CASCADE, related_name='login_credentials')
     login_id = models.CharField(max_length=255, verbose_name="ログインID")
     password = models.CharField(max_length=255, verbose_name="パスワード")
     role = models.CharField(max_length=255, verbose_name="権限")
@@ -111,3 +107,17 @@ class PreparedDocs(models.Model):
 
     def __str__(self):
         return f"Prepared Docs for {self.check_sheet.title}"
+    
+class AssessSchedule(models.Model):
+    check_sheet = models.ForeignKey(CheckSheet, on_delete=models.CASCADE, related_name='assessment_schedules')
+    start_date = models.DateField(verbose_name='実施日付（開始）', null=True)
+    end_date = models.DateField(verbose_name='実施日付（終了）', null=True)
+    start_time = models.TimeField(verbose_name='開始時刻', null=True)
+    end_time = models.TimeField(verbose_name='終了時刻', null=True)
+    extension_possible = models.BooleanField(verbose_name='延長可否', null=True)
+    extension_contact = models.BooleanField(verbose_name='連絡要否', null=True)
+    extension_continue = models.BooleanField(verbose_name='連絡不通時の続行', null=True)
+    backup_date = models.DateField(verbose_name='予備日', null=True)
+
+    def __str__(self):
+        return f"Assessment Schedule for {self.check_sheet.title}"

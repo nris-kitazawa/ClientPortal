@@ -140,6 +140,8 @@ class RequiredQuestionForm(BaseForm):
         return cleaned_data
     
 class PreparedDocsForm(BaseForm):
+
+    
     class Meta:
         model = PreparedDocs
         fields = '__all__'
@@ -152,3 +154,41 @@ class PreparedDocsForm(BaseForm):
             'network_configuration_diagram': forms.CheckboxInput(),
             'web_server_directory_list': forms.CheckboxInput(),
         }
+
+
+class AssessScheduleForm(BaseForm):
+
+    def create_typed_choice_field(label, choices):
+        return forms.TypedChoiceField(
+            choices=choices,
+            coerce=lambda x: x == 'True',
+            widget=forms.RadioSelect,
+            required=False,
+            label=label
+        )
+
+    extension_possible = create_typed_choice_field('延長可否', [(True, '必要'), (False, '不要')])
+    extension_contact = create_typed_choice_field('連絡要否', [(True, '必要'), (False, '不要')])
+    extension_continue = create_typed_choice_field('連絡不通時の続行', [(True, '可能'), (False, '不可能')])
+
+    class Meta:
+        model = AssessSchedule
+        fields = '__all__'  # すべてのフィールドをフォームに含める
+        exclude = ['check_sheet']
+        widgets = {
+            'start_date': forms.DateInput(attrs={'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'type': 'date'}),
+            'start_time': forms.TimeInput(attrs={'type': 'time', 'value': '07:00'}),
+            'end_time': forms.TimeInput(attrs={'type': 'time', 'value': '22:00'}),
+            'backup_date': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        extension_contact = cleaned_data.get('extension_contact')
+        extension_continue = cleaned_data.get('extension_continue')
+
+        if extension_contact and not extension_continue:
+            raise forms.ValidationError('連絡は必要としてください。')
+
+        return cleaned_data

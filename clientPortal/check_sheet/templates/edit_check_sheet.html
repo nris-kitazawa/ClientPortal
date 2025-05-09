@@ -186,6 +186,20 @@
         </table>
     </div>
 
+    <h2>診断実施日時（必須）</h2>
+    <div class="hearing-table-container">
+        <table class="hearing-table">
+            <tbody>
+                {% for field in assess_schedule_form %}
+                <tr>
+                    <td>{{ field.label_tag }}</td>
+                    <td>{{ field }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
     <br>
     <button type="button" onclick="window.history.back();">キャンセル</button>
     <button type="submit">保存</button>

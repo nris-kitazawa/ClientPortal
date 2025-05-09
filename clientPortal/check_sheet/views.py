@@ -84,6 +84,7 @@ def edit_check_sheet(request, id):
     system_summary, _ = SystemSummary.objects.get_or_create(check_sheet=check_sheet)
     required_question, _ = RequiredQuestion.objects.get_or_create(check_sheet=check_sheet)
     prepared_docs, _ = PreparedDocs.objects.get_or_create(check_sheet=check_sheet)
+    assess_schedule, _ = AssessSchedule.objects.get_or_create(check_sheet=check_sheet)
 
     # --- フォームとフォームセットの定義をまとめる ---
     form_configs = [
@@ -130,6 +131,12 @@ def edit_check_sheet(request, id):
             "name": "prepared_docs_form",
             "form_class": PreparedDocsForm,
             "instance": prepared_docs,
+        },
+        {
+            "type": "form",
+            "name": "assess_schedule_form",
+            "form_class": AssessScheduleForm,
+            "instance": assess_schedule,
         },
     ]
 
