@@ -128,11 +128,11 @@
     </div>
     <button type="button" id="add-login-row-btn">1行追加</button>
 
-    <h2>診断対象に関するヒアリング事項（必須）</h2>
+    <h2>事前に準備していただく資料（可能な範囲でご提供願います）</h2>
     <div class="hearing-table-container">
         <table class="hearing-table">
             <tbody>
-                {% for field in required_question_form %}
+                {% for field in prepared_docs_form %}
                 <tr>
                     <td>{{ field.label_tag }}</td>
                     <td>{{ field }}</td>

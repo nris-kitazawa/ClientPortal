@@ -203,3 +203,53 @@ document.addEventListener("input", function (e) {
     }
 });
 
+document.addEventListener('DOMContentLoaded', function () {
+    const ipAddressManagementField = document.querySelectorAll('input[name="ip_address_management"]');
+    const outsourcingInfoRow = document.getElementById('outsourcing-info-row');
+    const preApplicationRequiredRow = document.getElementById('pre-application-required-row');
+    const preApplicationStatusRow = document.getElementById('pre-application-status-row');
+    const preApplicationRequiredField = document.querySelectorAll('input[name="pre_application_required"]'); // 修正ポイント
+
+    function getSelectedValue(radioButtons) {
+        for (const radio of radioButtons) {
+            if (radio.checked) {
+                return radio.value;
+            }
+        }
+        return null;
+    }
+
+    function toggleFields() {
+        const selectedValue = getSelectedValue(ipAddressManagementField);
+        console.log('Selected value (ip_address_management):', selectedValue); // デバッグ用
+
+        if (selectedValue !== '自社管理') {
+            outsourcingInfoRow.style.display = '';
+            preApplicationRequiredRow.style.display = '';
+
+            const preApplicationRequiredValue = getSelectedValue(preApplicationRequiredField); // 修正ポイント
+            console.log('Selected value (pre_application_required):', preApplicationRequiredValue); // デバッグ用
+
+            if (preApplicationRequiredValue === 'True') {
+                preApplicationStatusRow.style.display = '';
+            } else {
+                preApplicationStatusRow.style.display = 'none';
+            }
+        } else {
+            outsourcingInfoRow.style.display = 'none';
+            preApplicationRequiredRow.style.display = 'none';
+            preApplicationStatusRow.style.display = 'none';
+        }
+    }
+
+    // ラジオボタンの変更イベントを監視
+    ipAddressManagementField.forEach(radio => {
+        radio.addEventListener('change', toggleFields);
+    });
+
+    preApplicationRequiredField.forEach(radio => { // 修正ポイント
+        radio.addEventListener('change', toggleFields);
+    });
+
+    toggleFields(); // 初期状態を設定
+});

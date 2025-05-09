@@ -83,6 +83,7 @@ def edit_check_sheet(request, id):
     check_sheet = get_object_or_404(CheckSheet, id=id)
     system_summary, _ = SystemSummary.objects.get_or_create(check_sheet=check_sheet)
     required_question, _ = RequiredQuestion.objects.get_or_create(check_sheet=check_sheet)
+    prepared_docs, _ = PreparedDocs.objects.get_or_create(check_sheet=check_sheet)
 
     # --- フォームとフォームセットの定義をまとめる ---
     form_configs = [
@@ -123,7 +124,13 @@ def edit_check_sheet(request, id):
             "name" : "required_question_form",
             "form_class" : RequiredQuestionForm,
             "instance" : required_question,
-        }
+        },
+        {
+            "type": "form",
+            "name": "prepared_docs_form",
+            "form_class": PreparedDocsForm,
+            "instance": prepared_docs,
+        },
     ]
 
     context = {"check_sheet": check_sheet}

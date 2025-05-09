@@ -7,7 +7,7 @@ class BaseForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # フォームのラベルのサフィックスを空に設定
-        kwargs.setdefault('label_suffix', '')
+        self.label_suffix = ''  # 修正ポイント
         # RadioSelectの初期値をNoneに設定
         for field_name, field in self.fields.items():
             if isinstance(field.widget, forms.RadioSelect):
@@ -83,7 +83,18 @@ class CheckSheetDetailForm(BaseForm):
         for field in self.fields.values():
             field.disabled = True
 
+from django import forms
+from .models import RequiredQuestion
+
 class RequiredQuestionForm(BaseForm):
+    pre_application_required = forms.TypedChoiceField(
+        label='事前申請が必要ですか',
+        choices=[(True, 'はい'), (False, 'いいえ')],
+        coerce=lambda x: x == 'True',  # 'True' を Python の True に変換
+        widget=forms.RadioSelect,
+        required=False  # 必須にする場合は True に変更
+    )
+
     class Meta:
         model = RequiredQuestion
         fields = '__all__'
@@ -91,4 +102,53 @@ class RequiredQuestionForm(BaseForm):
         widgets = {
             'ip_address_management': forms.RadioSelect,
             'pre_application_status': forms.RadioSelect,
+        }
+
+    def clean_outsourcing_info(self):
+        """
+        外部委託先の情報が必要な場合にバリデーションを行う
+        """
+        ip_address_management = self.cleaned_data.get('ip_address_management')
+        outsourcing_info = self.cleaned_data.get('outsourcing_info')
+
+        if ip_address_management != '自社管理' and not outsourcing_info:
+            raise forms.ValidationError('外部委託先の情報を入力してください。')
+
+        return outsourcing_info
+
+    def clean_pre_application_status(self):
+        """
+        事前申請が必要な場合に申請状況をチェック
+        """
+        pre_application_required = self.cleaned_data.get('pre_application_required')
+        pre_application_status = self.cleaned_data.get('pre_application_status')
+
+        if pre_application_required and not pre_application_status:
+            raise forms.ValidationError('申請状況を選択してください。')
+
+        return pre_application_status
+
+    def clean(self):
+        """
+        全体のバリデーションを実行
+        """
+        cleaned_data = super().clean()
+        # 他のフィールドのバリデーションを呼び出す
+        self.clean_outsourcing_info()
+        self.clean_pre_application_status()
+
+        return cleaned_data
+    
+class PreparedDocsForm(BaseForm):
+    class Meta:
+        model = PreparedDocs
+        fields = '__all__'
+        exclude = ['check_sheet']
+        widgets = {
+            'session_management_design': forms.CheckboxInput(),
+            'authentication_design': forms.CheckboxInput(),
+            'target_screen_list': forms.CheckboxInput(),
+            'screen_transition_diagram': forms.CheckboxInput(),
+            'network_configuration_diagram': forms.CheckboxInput(),
+            'web_server_directory_list': forms.CheckboxInput(),
         }
