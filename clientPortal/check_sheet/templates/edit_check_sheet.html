@@ -128,6 +128,50 @@
     </div>
     <button type="button" id="add-login-row-btn">1行追加</button>
 
+    <h2>診断対象に関するヒアリング事項（必須）</h2>
+    <div class="hearing-table-container">
+        <table class="hearing-table">
+            <tbody>
+                <tr>
+                    <td>{{ required_question_form.ip_address_management.label_tag }}</td>
+                    <td>
+                        {{ required_question_form.ip_address_management }}
+                        {% if required_question_form.ip_address_management.errors %}
+                            <div class="error">{{ required_question_form.ip_address_management.errors }}</div>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr id="outsourcing-info-row" style="display: none;">
+                    <td>{{ required_question_form.outsourcing_info.label_tag }}</td>
+                    <td>
+                        {{ required_question_form.outsourcing_info }}
+                        {% if required_question_form.outsourcing_info.errors %}
+                            <div class="error">{{ required_question_form.outsourcing_info.errors }}</div>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr id="pre-application-required-row" style="display: none;">
+                    <td>{{ required_question_form.pre_application_required.label_tag }}</td>
+                    <td>
+                        {{ required_question_form.pre_application_required }}
+                        {% if required_question_form.pre_application_required.errors %}
+                            <div class="error">{{ required_question_form.pre_application_required.errors }}</div>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr id="pre-application-status-row" style="display: none;">
+                    <td>{{ required_question_form.pre_application_status.label_tag }}</td>
+                    <td>
+                        {{ required_question_form.pre_application_status }}
+                        {% if required_question_form.pre_application_status.errors %}
+                            <div class="error">{{ required_question_form.pre_application_status.errors }}</div>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
     <h2>事前に準備していただく資料（可能な範囲でご提供願います）</h2>
     <div class="hearing-table-container">
         <table class="hearing-table">
@@ -143,6 +187,7 @@
     </div>
 
     <br>
+    <button type="button" onclick="window.history.back();">キャンセル</button>
     <button type="submit">保存</button>
 </form>
 
